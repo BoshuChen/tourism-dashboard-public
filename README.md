@@ -150,7 +150,6 @@ In addition a number of JavaScript libraries are used, these are all found in th
 * `jszip.min.js` ([website](https://stuk.github.io/jszip/)) is used by `dygraph-extra.js` to automatically zip together multiple png files to download multiple plots at the same time.
 * `accounting.min.js` ([website](http://openexchangerates.github.io/accounting.js/)) provides a number of functions for formatting numbers and currency. It is used to format numbers in dygraphs.
 * `jquery-ui-1-11-4.min.js` adds [jQuery UI](http://jqueryui.com/). Shiny comes with a limited set of jQuery UI already, but this adds the entire set. Currently [tooltip](http://jqueryui.com/tooltip/) is used to add better tooltips, and [accordion](http://jqueryui.com/accordion/) is used for the show/hide inputs feature, as well as the examples in the front/about page.
-* `jquery-ui-hoverintent.js` adds a hover-intent mouse event for use by jQuery UI.
 * `iframeResizer.contentWindow.min.js` ([website](http://davidjbradshaw.github.io/iframe-resizer/)) makes it possible to automatically resize iframe height to fit the shiny app contents. This script is only part of the code for this to work, code must also be run in the page that has the iframe. This latter part is handled by MBIE web services.
 
 This work is licensed under a [Creative Commons Attribution 3.0 New Zealand License](http://creativecommons.org/licenses/by/3.0/nz/).

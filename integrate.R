@@ -46,8 +46,8 @@ shinydir = "shiny/new"
 ##      "prod" -> https://mbienz.shinyapps.io/tourism_dashboard_prod
 ## If deploysuffix = NULL, shiny app is not deployed
 # deploysuffix = "new"
-# deploysuffix = "prod"
-deploysuffix = NULL
+ deploysuffix = "prod"
+#deploysuffix = NULL
 
 ##########################
 ## Supporting Functions ##

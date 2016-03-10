@@ -1,6 +1,8 @@
 library(shiny)
 library(dplyr)
 library(tidyr)
+## Compatibility change for tidyr
+if(packageVersion("tidyr") >= "0.4.0") gather = function(...) tidyr:::gather(..., factor_key = TRUE)
 library(zoo)
 library(xts)
 library(dygraphs)

@@ -646,7 +646,7 @@ iact = function(env_serv) with(env_serv, {
    # )
    
    ## Event line to note IVS revision 2013
-   ivs_rev = list(list(date = "2013-08-01", label = "IVS revision 2013", labelLoc = "top"))
+   ivs_rev = list(list("2013-08-01", label = "IVS revision 2013", labelLoc = "top"))
    
    ## ROW 1
    ## Nights Stayed
