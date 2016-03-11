@@ -1,3 +1,16 @@
+## Public version of the source code
+This repo is a public version of the source code for the [New Zealand Tourism Dashboard](https://mbienz.shinyapps.io/tourism_dashboard_prod/). The Dashboard is built with R, JavaScript and Shiny. If you got this far, we have to assume you can look after yourself with R and navigating this GitHub repo; we can’t give detailed guidance or help. We won’t be accepting pull requests, and the issues tab in this repo will not be closely monitored.
+
+The app itself is contained in the `./shiny/new/` folder and can be run from the root directory with:
+
+```R
+shiny::runApp("shiny/new")
+```
+
+The `integrate.R` script and most of the code in the `./prep/` folder will not run because it depends on databases only available in the MBIE domain. It is included here for transparency.
+
+This code is published under a [Creative Commons license](http://creativecommons.org/licenses/by/3.0/nz/). While all care and diligence has been used, MBIE gives no warranty it is error free and will not be liable for any loss or damage suffered by the use directly, or indirectly, of the information.
+
 # New Zealand Tourism Dashboard
 Consolidated app that gives one-stop access by theme (rather than data collection) to the most interesting tourism data. The repository is organised into [prep](prep/) (run via [integrate](integrate.R)) and [shiny](shiny/) folders.
 
