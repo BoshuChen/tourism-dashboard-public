@@ -33,9 +33,6 @@ load("data/tourism_expenditure.rda")
 ## Overview - International Visitor Spend
 load("data/arriv.rda")
 load("data/ivs.rda")
-## Interim metadata addition to arriv
-attr(arriv, "date") = as.Date("2015-08-15")
-attr(arriv, "dataset") = "ITM"
 ## Fix ivs dates
 ivs$TimePeriod = local({
    ty = as.numeric(format(ivs$TimePeriod, "%Y"))

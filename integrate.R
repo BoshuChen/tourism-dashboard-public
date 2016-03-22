@@ -45,9 +45,9 @@ shinydir = "shiny/new"
 ## e.g. "new"  -> https://mbienz.shinyapps.io/tourism_dashboard_new
 ##      "prod" -> https://mbienz.shinyapps.io/tourism_dashboard_prod
 ## If deploysuffix = NULL, shiny app is not deployed
-# deploysuffix = "new"
- deploysuffix = "prod"
-#deploysuffix = NULL
+# deploysuffix = "test" # ie test environment.  This used to be called "new"
+# deploysuffix = "prod"
+deploysuffix = NULL
 
 ##########################
 ## Supporting Functions ##
@@ -247,18 +247,36 @@ for(curfx in fx_currencies){
 }
 save(env_forex_fallback, file = savepath("env_forex_fallback"))
 
+
+####################################
+#  Deployment
+##########################
+
+#----------------Save text file versions of data--------------
+# this does not do anything needed for the app, but makes it easier
+# to use a Git diff to see what has changed data to data
+source("test/save_text_versions.R")
+
+
+#-----------------Save copy for the public version----------
+source("prep/copy-to-public.R")
+# note - if you wish to update the public version of the source code, you need
+# to go to the tourism-dashboard-public repository on the same drive as youe
+# clone of the main repository, and push to 
+# https://github.com/nz-mbie/tourism-dashboard-public.git
+
 ######################
-## Deploy shiny app ##
+#-------------Deploy shiny app----
 ######################
 if(!is.null(deploysuffix)){
    ## Proxy password to get through MBIE firewall
    ## Note by Jimmy: Copied from old integrate, don't know if this is needed or if it works
-   # if(!exists("creds")){
-      # creds <- AskCreds(Title = "MBIE User Log In Name and Password", startuid = "", returnValOnCancel = "ID_CANCEL")   
-      # options(RCurlOptions = list(proxy = 'http://proxybcw.wd.govt.nz:8080',
-                                  # proxyusername = creds$uid, 
-                                  # proxypassword = creds$pwd))
-   # }
+   if(!exists("creds")){
+       creds <- mbie::AskCreds(Title = "MBIE User Log In Name and Password", startuid = "", returnValOnCancel = "ID_CANCEL")   
+       options(RCurlOptions = list(proxy = 'http://proxybcw.wd.govt.nz:8080',
+                                   proxyusername = creds$uid, 
+                                   proxypassword = creds$pwd))
+    }
    
    ## shinyapps renamed to rsconnect recently, some code to load either one
    ## LOGIC:
@@ -267,8 +285,21 @@ if(!is.null(deploysuffix)){
    ## rsconnect loaded with `require` for a TRUE/FALSE return value (and no error)
    ## shinyapps loaded with `library` so it gives an error if it fails
    isrsc = suppressWarnings(require(rsconnect, quietly = TRUE))
+   if(tolower(deploysuffix) == "prod"){
+      message("you are about to deploy the production version, please confirm y/n > ", appendLF = FALSE)
+      question <- readLines(n = 1)
+      
+   } else {
+      question <- "y"
+   }
+   
+   
    if(!isrsc) library(shinyapps)
-   deployApp(appDir = shinydir,
-             appName = paste0("tourism_dashboard_", deploysuffix),
-             account = "mbienz")
+   if(question == "y"){
+      deployApp(appDir = shinydir,
+                appName = paste0("tourism_dashboard_", deploysuffix),
+                account = "mbienz")
+      
+      
+   }
 }

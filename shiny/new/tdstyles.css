@@ -364,6 +364,7 @@ div.box-timeout {
 }
 .navbar-default .navbar-nav > li:hover {
    border-image: linear-gradient(to right, #157BA3 0%, #96D602 100%) 1 1 stretch;
+   border-image-width: 1 0 0 0;
 }
 .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
    background-color: transparent;

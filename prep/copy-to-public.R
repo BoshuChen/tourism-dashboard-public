@@ -1,4 +1,10 @@
 
+# Creates a copy of the source code and data in another repository on the same drive as your
+# main repository.  The idea is for that second repository to have
+# https://github.com/nz-mbie/tourism-dashboard-public.git
+# as a remote so it can then be pushed to that location.  Doesn't need to be done every time.
+# Peter Ellis March 2016
+
 if(!"tourism-dashboard-public" %in% dir("..")){
    stop("You need to have a repository called 'tourism-dashboard-public' on your
 drive hosting your main working 'tourism-dashboard' (or whatever you called it)
