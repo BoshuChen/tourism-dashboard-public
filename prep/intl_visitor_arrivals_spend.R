@@ -121,7 +121,7 @@ intl_visitor_spend = function(dataset_names){
       data.frame() %>%
       mutate(CountryGrouped = as.character(CountryGrouped)) %>%
       gather(Variable, Value, Spend:SpendPerNight) %>%
-      mutate(Variable = rename.levels(Variable,
+      mutate(Variable = rename.levels(factor(Variable),
                                       orig=c("Spend", "SpendPerTrip", "SpendPerNight"),
                                       new = c("Total spend", "Spend per trip", "Spend per night")) %>% as.character(),
              Type = "Country of residence") %>%
@@ -148,7 +148,7 @@ intl_visitor_spend = function(dataset_names){
       select(-Qtr) %>%
       data.frame() %>%
       gather(Variable, Value, Spend:SpendPerNight) %>%
-      mutate(Variable = rename.levels(Variable,
+      mutate(Variable = rename.levels(factor(Variable),
                                       orig=c("Spend", "SpendPerTrip", "SpendPerNight"),
                                       new = c("Total spend", "Spend per trip", "Spend per night")) %>% as.character(),
              Type = "Purpose of visit",

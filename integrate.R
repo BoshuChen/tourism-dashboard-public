@@ -45,9 +45,9 @@ shinydir = "shiny/new"
 ## e.g. "new"  -> https://mbienz.shinyapps.io/tourism_dashboard_new
 ##      "prod" -> https://mbienz.shinyapps.io/tourism_dashboard_prod
 ## If deploysuffix = NULL, shiny app is not deployed
-# deploysuffix = "test" # ie test environment.  This used to be called "new"
+deploysuffix = "test" # ie test environment.  This used to be called "new"
 # deploysuffix = "prod"
-deploysuffix = NULL
+# deploysuffix = NULL
 
 ##########################
 ## Supporting Functions ##
@@ -270,13 +270,13 @@ source("prep/copy-to-public.R")
 ######################
 if(!is.null(deploysuffix)){
    ## Proxy password to get through MBIE firewall
-   ## Note by Jimmy: Copied from old integrate, don't know if this is needed or if it works
    if(!exists("creds")){
        creds <- mbie::AskCreds(Title = "MBIE User Log In Name and Password", startuid = "", returnValOnCancel = "ID_CANCEL")   
-       options(RCurlOptions = list(proxy = 'http://proxybcw.wd.govt.nz:8080',
-                                   proxyusername = creds$uid, 
-                                   proxypassword = creds$pwd))
-    }
+   }
+    options(RCurlOptions = list(proxy = 'http://proxybcw.wd.govt.nz:8080',
+                                proxyusername = creds$uid, 
+                                proxypassword = creds$pwd))
+    
    
    ## shinyapps renamed to rsconnect recently, some code to load either one
    ## LOGIC:
@@ -286,7 +286,7 @@ if(!is.null(deploysuffix)){
    ## shinyapps loaded with `library` so it gives an error if it fails
    isrsc = suppressWarnings(require(rsconnect, quietly = TRUE))
    if(tolower(deploysuffix) == "prod"){
-      message("you are about to deploy the production version, please confirm y/n > ", appendLF = FALSE)
+      message("you are about to deploy the production version, please confirm [Y/n] > ", appendLF = FALSE)
       question <- readLines(n = 1)
       
    } else {
@@ -295,7 +295,7 @@ if(!is.null(deploysuffix)){
    
    
    if(!isrsc) library(shinyapps)
-   if(question == "y"){
+   if(tolower(question) == "y"){
       deployApp(appDir = shinydir,
                 appName = paste0("tourism_dashboard_", deploysuffix),
                 account = "mbienz")
