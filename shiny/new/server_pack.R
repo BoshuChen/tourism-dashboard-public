@@ -27,95 +27,107 @@ frontp = function(env_serv) with(env_serv, local({
    output$frontTableDown = tableComboDown(tabdat, curtitle)
 }))
 
-oeco = function(env_serv) with(env_serv, {
+oeco = function(env_serv) with(env_serv, local({
    ## Overview - Economic Contribution
    pal2 = paldy(unique(tourism_economic$Type), unique(tourism_economic$Type))
    pal1 = c(Domestic = mbie.cols2(4), International = mbie.cols2(3))
    
    ## GDP contribution as %
-   dat_spread = tourism_economic %>%
-      select(TimePeriod, Type, ValuePerc) %>%
-      spread(Type, ValuePerc)
-   curtitle = paste(
-      "Value added by tourism as a percentage of GDP",
-      "(year ended March)"
-   )
-   curdat = list(date = dat_spread$TimePeriod,
-                 num = dat_spread[c("Indirect", "Direct")])
-   output$oecogdpperc = dyquick(curdat, "Obs", 1, "percent-dp1",
-                           pal2, NULL, curtitle, "oecogdplabel",
-                           labelsSeparateLines = FALSE, stacked = TRUE)
+   local({
+      dat_spread = tourism_economic %>%
+         select(TimePeriod, Type, ValuePerc) %>%
+         spread(Type, ValuePerc)
+      curtitle = paste(
+         "Value added by tourism as a percentage of GDP",
+         "(year ended March)"
+      )
+      curdat = list(date = dat_spread$TimePeriod,
+                    num = dat_spread[c("Indirect", "Direct")])
+      output$oecogdpperc = dyquick(curdat, "Obs", 1, "percent-dp1",
+                              pal2, NULL, curtitle, "oecogdplabel",
+                              labelsSeparateLines = FALSE, stacked = TRUE)
+   })
    
    ## GDP contribution
-   dat_spread = tourism_economic %>%
-      select(TimePeriod, Type, Value) %>%
-      mutate(Value = Value/10^6) %>%
-      spread(Type, Value)
-   curtitle = paste(
-      "Value added by tourism",
-      "(year ended March)"
-   )
-   curdat = list(date = dat_spread$TimePeriod,
-                 num = dat_spread[c("Indirect", "Direct")])
-   output$oecogdp = dyquick(curdat, "Obs", 1, "dollar-m",
-                           pal2, NULL, curtitle, "oecogdplabel",
-                           labelsSeparateLines = FALSE, stacked = TRUE)
+   local({
+      dat_spread = tourism_economic %>%
+         select(TimePeriod, Type, Value) %>%
+         mutate(Value = Value/10^6) %>%
+         spread(Type, Value)
+      curtitle = paste(
+         "Value added by tourism",
+         "(year ended March)"
+      )
+      curdat = list(date = dat_spread$TimePeriod,
+                    num = dat_spread[c("Indirect", "Direct")])
+      output$oecogdp = dyquick(curdat, "Obs", 1, "dollar-m",
+                              pal2, NULL, curtitle, "oecogdplabel",
+                              labelsSeparateLines = FALSE, stacked = TRUE)
+   })
    
    ## Employment contribution as %
-   dat_spread = tourism_economic %>%
-      select(TimePeriod, Type, EmploymentPerc) %>%
-      spread(Type, EmploymentPerc)
-   curtitle = paste(
-      "Tourism employment as a percentage of total employment",
-      "(year ended March)"
-   )
-   curdat = list(date = dat_spread$TimePeriod,
-                 num = dat_spread[c("Indirect", "Direct")])
-   output$oecoempperc = dyquick(curdat, "Obs", 1, "percent-dp1",
-                           pal2, NULL, curtitle, "oecoemplabel",
-                           labelsSeparateLines = FALSE, stacked = TRUE)
+   local({
+      dat_spread = tourism_economic %>%
+         select(TimePeriod, Type, EmploymentPerc) %>%
+         spread(Type, EmploymentPerc)
+      curtitle = paste(
+         "Tourism employment as a percentage of total employment",
+         "(year ended March)"
+      )
+      curdat = list(date = dat_spread$TimePeriod,
+                    num = dat_spread[c("Indirect", "Direct")])
+      output$oecoempperc = dyquick(curdat, "Obs", 1, "percent-dp1",
+                              pal2, NULL, curtitle, "oecoemplabel",
+                              labelsSeparateLines = FALSE, stacked = TRUE)
+   })
    
    ## Employment contribution
-   dat_spread = tourism_economic %>%
-      select(TimePeriod, Type, Employment) %>%
-      mutate(Employment = Employment/10^3) %>%
-      spread(Type, Employment)
-   curtitle = paste(
-      "Tourism employment (in 000s)",
-      "(year ended March)"
-   )
-   curdat = list(date = dat_spread$TimePeriod,
-                 num = dat_spread[c("Indirect", "Direct")])
-   output$oecoemp = dyquick(curdat, "Obs", 1, "number",
-                           pal2, NULL, curtitle, "oecoemplabel",
-                           labelsSeparateLines = FALSE, stacked = TRUE)
+   local({
+      dat_spread = tourism_economic %>%
+         select(TimePeriod, Type, Employment) %>%
+         mutate(Employment = Employment/10^3) %>%
+         spread(Type, Employment)
+      curtitle = paste(
+         "Tourism employment (in 000s)",
+         "(year ended March)"
+      )
+      curdat = list(date = dat_spread$TimePeriod,
+                    num = dat_spread[c("Indirect", "Direct")])
+      output$oecoemp = dyquick(curdat, "Obs", 1, "number",
+                              pal2, NULL, curtitle, "oecoemplabel",
+                              labelsSeparateLines = FALSE, stacked = TRUE)
+   })
    
    ## Tourism as % of Exports
-   dat_spread = tourism_percexports
-   curtitle = paste(
-      "International tourism as a percentage of total exports",
-      "(year ended March)"
-   )
-   curdat = list(date = dat_spread$TimePeriod,
-                 num = data.frame(International = dat_spread$Value))
-   output$oecoexpperc = dyquick(curdat, "Obs", 1, "percent-dp1",
-                           pal1, NULL, curtitle, "oecoexplabel",
-                           labelsSeparateLines = FALSE, stacked = TRUE)
+   local({
+      dat_spread = tourism_percexports
+      curtitle = paste(
+         "International tourism as a percentage of total exports",
+         "(year ended March)"
+      )
+      curdat = list(date = dat_spread$TimePeriod,
+                    num = data.frame(International = dat_spread$Value))
+      output$oecoexpperc = dyquick(curdat, "Obs", 1, "percent-dp1",
+                              pal1, NULL, curtitle, "oecoexplabel",
+                              labelsSeparateLines = FALSE, stacked = TRUE)
+   })
    
    ## Total Intl Tourism Spend
-   dat_spread = tourism_expenditure %>%
-      mutate(Type = factor(gsub(" tourism expenditure", "", Type))) %>%
-      spread(Type, Value)
-   curtitle = paste(
-      "Tourism expenditure",
-      "(year ended March)"
-   )
-   curdat = list(date = dat_spread$TimePeriod,
-                 num = dat_spread[c("International", "Domestic")])
-   output$oecospend = dyquick(curdat, "Obs", 1, "dollar-m",
-                           pal1, NULL, curtitle, "oecoexplabel",
-                           labelsSeparateLines = FALSE, stacked = TRUE)
-})
+   local({
+      dat_spread = tourism_expenditure %>%
+         mutate(Type = factor(gsub(" tourism expenditure", "", Type))) %>%
+         spread(Type, Value)
+      curtitle = paste(
+         "Tourism expenditure",
+         "(year ended March)"
+      )
+      curdat = list(date = dat_spread$TimePeriod,
+                    num = dat_spread[c("International", "Domestic")])
+      output$oecospend = dyquick(curdat, "Obs", 1, "dollar-m",
+                              pal1, NULL, curtitle, "oecoexplabel",
+                              labelsSeparateLines = FALSE, stacked = TRUE)
+   })
+}))
 
 oiva = function(env_serv) with(env_serv, {
    ## Overview - International Visitor Arrivals
@@ -265,138 +277,252 @@ oivas = function(env_serv) with(env_serv, {
    })
 })
 
-rs_all = function(env_serv) with(env_serv, {
-   allPeriods = rs_data$allPeriods
-   CurrentYear = rs_data$CurrentYear
-   
-   #############
-   ## Summary ##
-   #############
+rs_all = function(env_serv) with(env_serv, local({
    ## Establish a reactive list
    rsvals = reactiveValues()
    
+   ## Get colours and strip transparency
+   col_all = substr(tourism.cols(c(3, 14, 8)), 0, 7)
+   col_cur = col_all[1]
+   col_curlight = col_all[2]
+   col_NZ = col_all[3]
+   
+   ## Sub-functions
+   rs_ts_data = function(Area, domint){
+      out = MVmod %>%
+         filter(Type == domint) %>%
+         group_by_("Date", Area) %>%
+         summarise(Spend = sum(Spend)) %>%
+         arrange(Date) %>%
+         rename_(Area = Area)
+      class(out) = "data.frame"
+      out
+   }
+   rs_ts_title = function(subarea, domint){
+      domintlong = switch(domint,
+         dom = "Domestic",
+         int = "International"
+      )
+      paste0(domintlong, " tourist expenditure in ", subarea)
+   }
+   rs_ts_prep = function(rsdata, subarea, domint){
+      basedat = rsdata[[paste0("ts_", domint)]] %>%
+         filter(Area == subarea)
+      list(
+         data = list(date = basedat$Date, num = basedat["Spend"]),
+         title = rs_ts_title(subarea, domint)
+      )
+   }
+   rs_ts_roll = function(numdat, subarea){
+      ## Original values for current area
+      ## + 12-month rolling average for area
+      curnum = cbind(
+         numdat[,"Spend"],
+         rollmean(numdat[,"Spend"], 12, fill = NA, align = "right")
+      )
+      colnames(curnum) = c(subarea, paste(subarea, "(12-mth)"))
+      curnum
+   }
+   rs_ts = function(curdat, subarea, main = NULL, ylab = "Spend",
+                    labelsDiv = "rstslabels", labelsSeparateLines = FALSE){
+      curnum = rs_ts_roll(curdat$num, subarea)
+      yformat = paste0("function(number){",
+         "return accounting.formatMoney(number, ",
+         "{precision: ", max(0, getdp(curnum[,1]) - 2), "}) + 'm';}")
+      xts(curnum, curdat$date) %>%
+         padxts() %>%
+         dygraph(main = main) %>%
+         dySeries(subarea, strokePattern = "dotted", color = col_curlight) %>%
+         dySeries(paste(subarea, "(12-mth)"), strokeWidth = 3, color = col_cur) %>%
+         dyRangeSelector() %>%
+         dyLegend(labelsDiv = labelsDiv, labelsSeparateLines = labelsSeparateLines) %>%
+         dyCallbacks(drawCallback = dyRegister()) %>%
+         dyHighlight(highlightSeriesOpts = list(strokeWidth = 5)) %>%
+         dyAxis("y", ylab, valueFormatter = yformat, axisLabelFormatter = yformat) %>%
+         dyOptions(rightGap = 25) %>%
+         return
+   }
+   
+   rs_prop_by =
+   ## Group the RTE subset by Origin or Product and compute proportions
+   ## Also compute the proportions for All New Zealand, for comparison
+   function(Area, domint, byvar){
+      rs_spread = MVYE %>%
+         filter(Type == domint, YearEnded == max(MVYEyears)) %>%
+         group_by_(byvar, Area) %>%
+         summarise(Spend = sum(Spend)) %>%
+         spread_(Area, "Spend")
+      rs_prop = cbind(
+         rs_spread[,1],
+         "All New Zealand" = apply(rs_spread[,-1], 1, function(x) sum(x, na.rm = TRUE))/
+                                   sum(rs_spread[,-1], na.rm = TRUE),
+         apply(rs_spread[,-1], 2, function(x) x/sum(x, na.rm = TRUE))
+      )
+      rs_by = switch(byvar,
+         Origin = gather(rs_prop, Area, Spend, -Origin),
+         Product = gather(rs_prop, Area, Spend, -Product)
+      )
+      
+      rs_by
+   }
+   rs_prop_subarea =
+      ## Get only the chosen subarea
+      ## rs_prop_by %>% rs_prop_subarea
+      function(rs_by, subarea){
+         rs_by_filter = filter(rs_by, Area %in% c("All New Zealand", subarea))
+         rs_by_filter$Area = factor(rs_by_filter$Area)
+         rs_by_filter
+      }
+   rs_prop_title = function(subarea, domint){
+      ggvisTitle(
+         "Proportion of ", domint, " tourist spend in ", subarea, 
+         " compared to all New Zealand (for the year ended ", MVYE_str_last, ")"
+      )
+   }
+   rs_prop_title_hc = function(subarea, domint){
+      paste0(
+         "Proportion of ", domint, " tourist spend in ", subarea, 
+         " compared to all New Zealand (for the year ended ", MVYE_str_last, ")"
+      )
+   }
+   rs_dc_diff = function(curdat){
+      dat_diff = spread(curdat, Area, Spend)
+      names(dat_diff) = c("y", "x1", "x2")
+      dat_diff$col = col_cur
+      dat_diff$col[dat_diff[,2] > dat_diff[,3]] = col_NZ
+      dat_diff
+   }
+   rs_dc_shared = function(vis, dat_diff){
+      vis %>%
+         layer_rects(x = ~x1, x2 = ~x2, y = ~y, height := 1,
+                     stroke := ~col, fill := ~col, opacity := 0.3, data = dat_diff) %>%
+         layer_points() %>%
+         add_axis("x", title = "Proportion of total spend", format = "%", tick_size_end = 0) %>%
+         add_axis("y", title = "", tick_size_end = 0) %>%
+         scale_ordinal("y", reverse = TRUE) %>%
+         scale_ordinal("stroke", range = c(col_NZ, col_cur)) %>%
+         scale_ordinal("fill", range = c(col_NZ, col_cur)) %>%
+         hide_legend("stroke") %>%
+         #hide_legend("fill") %>%
+         add_legend("fill", title = "") %>%
+         return
+   }
+   rs_origin = function(curdat, subarea, domint){
+      curdat %>%
+         ggvis(x = ~Spend, y = ~Origin, stroke = ~Area, fill = ~Area) %>%
+         rs_dc_shared(rs_dc_diff(curdat)) %>%
+         add_tooltip(function(input){
+            if(is.null(input)) NULL else
+            paste0(round(input$Spend * 100, 1), "% of ", domint, " spending come from ",
+                   input$Origin, " for ", input$Area)
+         }) %>%
+         set_options(width = "auto", height = 500, duration = 0, renderer = "canvas") %>%
+         return
+   }
+   rs_product = function(curdat, domint){
+      curdat %>%
+         ggvis(x = ~Spend, y = ~Product, stroke = ~Area, fill = ~Area) %>%
+         rs_dc_shared(rs_dc_diff(curdat)) %>%
+         add_tooltip(function(input){
+            if(is.null(input)) NULL else
+            paste0(round(input$Spend * 100, 1), "% of ", domint, " spending come from ",
+                   input$Product, " for ", input$Area)
+         }) %>%
+         set_options(width = "auto", height = 250, duration = 0, renderer = "canvas") %>%
+         return
+   }
+   rs_product_hc = function(curdat, domint, main){
+      ttipformat = paste0('<b>{point.y:.1f}%</b> of ', domint, ' spending come from<br/>',
+                          '<em>{point.category}</em><br/>',
+                          'for {series.name}<br/>')
+      curdat %>%
+         mutate(Spend = Spend * 100) %>%
+         hcdotchart(list(x = "Spend", y = "Product", comp = "Area"),
+                    main = main, xlab = "Proportion of total spend (%)",
+                    ttipformat = ttipformat, cols = c(col_cur, col_NZ))
+   }
+   
    observe({
       rsdata = list(
-         rti_dom = rs_rti_subset(rs_data$RTI, input$rsAreaClass, "Domestic"),
-         rti_int = rs_rti_subset(rs_data$RTI, input$rsAreaClass, "International"),
-         rte_dom = rs_rte_subset(rs_data$RTE, input$rsAreaClass, "Domestic", CurrentYear),
-         rte_int = rs_rte_subset(rs_data$RTE, input$rsAreaClass, "International", CurrentYear)
+         ts_dom = rs_ts_data(input$rsAreaClass, "Domestic"),
+         ts_int = rs_ts_data(input$rsAreaClass, "International")
       )
-      rsdata$rti_domNZ = (rsdata$rti_dom %>% group_by(Period) %>% summarise(NZ = sum(Spend)))[,2]
-      rsdata$rti_intNZ = (rsdata$rti_int %>% group_by(Period) %>% summarise(NZ = sum(Spend)))[,2]
+      rsdata$ts_domNZ = rsdata$ts_dom %>% group_by(Date) %>% summarise(NZ = sum(Spend))
+      rsdata$ts_intNZ = rsdata$ts_int %>% group_by(Date) %>% summarise(NZ = sum(Spend))
       
       ## By Origin
-      rsdata$rte_dom_origin = rs_rte_by(rsdata$rte_dom, "Origin")
-      rsdata$rte_int_origin = rs_rte_by(rsdata$rte_int, "Origin")
+      # rsdata$rte_dom_origin = rs_prop_by(input$rsAreaClass, "Domestic", "Origin")
+      rsdata$rte_int_origin = rs_prop_by(input$rsAreaClass, "International", "Origin")
       
       ## By Product
-      rsdata$rte_dom_product = rs_rte_by(rsdata$rte_dom, "Product")
-      rsdata$rte_int_product = rs_rte_by(rsdata$rte_int, "Product")
+      rsdata$rte_dom_product = rs_prop_by(input$rsAreaClass, "Domestic", "Product")
+      rsdata$rte_int_product = rs_prop_by(input$rsAreaClass, "International", "Product")
       
       rsvals$data = rsdata
    })
    
    observe({
-      rsvals$rsAreaSub = condInputServer(input, "rsAreaSub", rs_data$areaclass, cond_simple = "rsAreaClass")
-      rsvals$baserow = which(allPeriods == input$rstsBase)
+      rsvals$rsAreaSub = condInputServer(input, "rsAreaSub", MVareaclass, cond_simple = "rsAreaClass")
    })
    
    ## ROW 1
    output$rstsint = renderDygraph({
-      ts_prep = rs_ts_prep(rsvals$data, rsvals$rsAreaSub, "int", CurrentYear)
-      rs_ts(ts_prep$data, rsvals$rsAreaSub, rsvals$baserow, ts_prep$title, labelsDiv = "rstsintlabels")
+      ts_prep = rs_ts_prep(rsvals$data, rsvals$rsAreaSub, "int")
+      rs_ts(ts_prep$data, rsvals$rsAreaSub, ts_prep$title, labelsDiv = "rstsintlabels")
    })
    output$rstsdom = renderDygraph({
-      ts_prep = rs_ts_prep(rsvals$data, rsvals$rsAreaSub, "dom", CurrentYear)
-      rs_ts(ts_prep$data, rsvals$rsAreaSub, rsvals$baserow, ts_prep$title, labelsDiv = "rstsdomlabels")
+      ts_prep = rs_ts_prep(rsvals$data, rsvals$rsAreaSub, "dom")
+      rs_ts(ts_prep$data, rsvals$rsAreaSub, ts_prep$title, labelsDiv = "rstsdomlabels")
    })
    
    ## ROW 2
    observe({
+      domint = "International"
       ## Title
-      output$rsoriginintTitle = ggvisTitle("Proportion of international tourist spend in ", rsvals$rsAreaSub, 
-            " compared to all New Zealand (for the year ending March ", CurrentYear, ")")
+      output$rsoriginintTitle = rs_prop_title(rsvals$rsAreaSub, domint)
       ## Plot
-      rs_rte_subarea(rsvals$data$rte_int_origin, rsvals$rsAreaSub) %>%
-         rs_origin(rsvals$rsAreaSub, "International", CurrentYear) %>%
+      rs_prop_subarea(rsvals$data$rte_int_origin, rsvals$rsAreaSub) %>%
+         rs_origin(rsvals$rsAreaSub, domint) %>%
          bind_shiny("rsoriginint")
    })
+   ## Disable domestic origin, since there's currently no data on domestic origins
+   if(FALSE){
    observe({
+      domint = "Domestic"
       ## Title
-      output$rsorigindomTitle = ggvisTitle("Proportion of domestic tourist spend in ", rsvals$rsAreaSub, 
-            " compared to all New Zealand (for the year ending March ", CurrentYear, ")")
+      output$rsorigindomTitle = rs_prop_title(rsvals$rsAreaSub, domint)
       ## Plot
-      rs_rte_subarea(rsvals$data$rte_dom_origin, rsvals$rsAreaSub) %>%
-         rs_origin(rsvals$rsAreaSub, "Domestic", CurrentYear) %>%
+      rs_prop_subarea(rsvals$data$rte_dom_origin, rsvals$rsAreaSub) %>%
+         rs_origin(rsvals$rsAreaSub, domint) %>%
          bind_shiny("rsorigindom")
    })
+   }
    
    ## ROW 2
    observe({
+      domint = "International"
       ## Title
-      output$rsproductintTitle = ggvisTitle("Proportion of international tourist spend in ", rsvals$rsAreaSub, 
-            " compared to all New Zealand (for the year ending March ", CurrentYear, ")")
+      output$rsproductintTitle = rs_prop_title(rsvals$rsAreaSub, domint)
       ## Plot
-      rs_rte_subarea(rsvals$data$rte_int_product, rsvals$rsAreaSub) %>%
-         rs_product("International") %>%
+      rs_prop_subarea(rsvals$data$rte_int_product, rsvals$rsAreaSub) %>%
+         rs_product(domint) %>%
          bind_shiny("rsproductint")
    })
    observe({
+      domint = "Domestic"
       ## Title
-      output$rsproductdomTitle = ggvisTitle("Proportion of domestic tourist spend in ", rsvals$rsAreaSub, 
-            " compared to all New Zealand (for the year ending March ", CurrentYear, ")")
+      output$rsproductdomTitle = rs_prop_title(rsvals$rsAreaSub, domint)
       ## Plot
-      rs_rte_subarea(rsvals$data$rte_dom_product, rsvals$rsAreaSub) %>%
-         rs_product("Domestic") %>%
+      rs_prop_subarea(rsvals$data$rte_dom_product, rsvals$rsAreaSub) %>%
+         rs_product(domint) %>%
          bind_shiny("rsproductdom")
+      ## hc test
+      # output$rsproductdom = renderHighchart({
+         # rs_prop_subarea(rsvals$data$rte_dom_product, rsvals$rsAreaSub) %>%
+            # rs_product_hc(domint, rs_prop_title_hc(rsvals$rsAreaSub, domint))
+      # }) 
    })
-   
-   #####################
-   ## Download as PDF ##
-   #####################
-   observe({
-      pdf_make = function(file){
-         pdf_dat = list(
-            area = rsvals$rsAreaSub,
-            CurrentYear = CurrentYear,
-            mbie_footer = mbie_footer,
-            ts_int = {
-               ts_prep = rs_ts_prep(rsvals$data, rsvals$rsAreaSub, "int", CurrentYear)
-               rs_ts_ggplot(ts_prep$data, rsvals$rsAreaSub, rsvals$baserow, ts_prep$title, TRUE)
-            },
-            ts_dom = {
-               ts_prep = rs_ts_prep(rsvals$data, rsvals$rsAreaSub, "dom", CurrentYear)
-               rs_ts_ggplot(ts_prep$data, rsvals$rsAreaSub, rsvals$baserow, ts_prep$title, FALSE)
-            },
-            dc_origin_int = {
-               rs_rte_subarea(rsvals$data$rte_int_origin, rsvals$rsAreaSub) %>%
-                  rs_dc_ggplot("Origin", rsvals$rsAreaSub, "International")
-            },
-            dc_origin_dom = {
-               rs_rte_subarea(rsvals$data$rte_dom_origin, rsvals$rsAreaSub) %>%
-                  rs_dc_ggplot("Origin", rsvals$rsAreaSub, "Domestic")
-            },
-            dc_product_int = {
-               rs_rte_subarea(rsvals$data$rte_int_product, rsvals$rsAreaSub) %>%
-                  rs_dc_ggplot("Product", rsvals$rsAreaSub, "International")
-            },
-            dc_product_dom = {
-               rs_rte_subarea(rsvals$data$rte_dom_product, rsvals$rsAreaSub) %>%
-                  rs_dc_ggplot("Product", rsvals$rsAreaSub, "Domestic")
-            }
-         )
-         rs_pdf(file, pdf_dat)
-      }
-      pdf_name = function(){
-         paste0(input$rsAreaClass, "-", rsvals$rsAreaSub, ".pdf")
-      }
-      output$rspdf = downloadHandler(
-         filename = pdf_name,
-         content = pdf_make,
-         contentType = "application/pdf"
-      )
-   })
-})
+}))
 
 racc = function(env_serv) with(env_serv, {
    ## Regions - Acccommodation
@@ -499,36 +625,60 @@ racc = function(env_serv) with(env_serv, {
 })
 
 rins = function(env_serv) with(env_serv, {
-   all_levels = env_rte$all_rte_levels
-   
    observe({
-      rinsOrigin = switch(input$rinsdomint,
-         All = all_levels$Origin[1],
-         Domestic = input$rinsOriginDomestic,
+      domint = input$rinsdomint
+      rinsOrigin = switch(domint,
+         All = MVoriginsAll[1],
+         # Domestic = input$rinsOriginDomestic,
+         Domestic = MVoriginslist$Domestic[1],
          International = input$rinsOriginInternational
       )
-      flist = list(YEMar = input$rinsYear, Origin = rinsOrigin, Product = all_levels$Product[-1])
+      flist = list(YearEnded = input$rinsYear, Origin = rinsOrigin, Product = MVproducts[-1])
       rinsRTR = input$rinsRTR
-      flist[[rinsRTR]] = all_levels[[rinsRTR]][-1]
+      flist[[rinsRTR]] = MVarealist[[rinsRTR]]
       
-      raw_rte = getdat(env_rte$all_rte, "Product", rinsRTR, "Spend", flist)
-      out_rte = rename_(raw_rte, Area = rinsRTR)
+      curdat = (if(domint == "All") MVYE else filter(MVYE, Type == domint)) %>%
+         getdat("Product", rinsRTR, "Spend", flist) %>%
+         rename_(Area = rinsRTR)
       
+      ## Order by size
+      lsum = curdat %>%
+         group_by(Area) %>%
+         summarise(Spend = sum(Spend)) %>%
+         arrange(desc(Spend))
+      lorder = as.character(lsum$Area)
+      curdat$Area = factor(curdat$Area, levels = lorder)
+      
+      ############################
       scaled = input$rinsScaled == "sv"
       plist = list(x = "Area", y = "Spend", fill = "Product")
       titles = list(x = "", fill = "Product")
       titles$y = if(scaled) "Percentage of spend" else "Visitor spend ($ millions)"
       ttips = c(prefix = "$", suffix = "m")
       ggshiny = if(scaled) "rinsggsv" else "rinsggdv"
-      ggstackbar(out_rte, plist, titles, ttips, scaled) %>% bind_shiny(ggshiny)
+      ggstackbar(curdat, plist, titles, ttips, scaled) %>% bind_shiny(ggshiny)
       
       ## Title
       output$rinsggTitle = ggvisTitle("Spend by product for ",
          gsub("_", "", rinsRTR, fixed = TRUE), "s from ", rinsOrigin,
-         " (year ended March ", input$rinsYear, ")")
+         " (year ended ", MVYE_str, " ", input$rinsYear, ")")
+      ############################
+      
+      # scaled = input$rinsScaled == "sv"
+      # plist = list(x = "Area", y = "Spend", fill = "Product")
+      # titles = list(
+         # main = paste0("Spend by product for ",
+            # gsub("_", "", rinsRTR, fixed = TRUE), "s from ", rinsOrigin,
+            # " (year ended ", MVYE_str, " ", input$rinsYear, ")"),
+         # y = if(scaled) "Percentage of spend" else "Visitor spend ($ millions)"
+      # )
+      # yformat = if(scaled) list(prefix = "", suffix = "%") else list(prefix = "$", suffix = "m")
+      # output$rinshc = renderHighchart({
+         # hc_stackbar(curdat, plist, titles, yformat, scaled)
+      # })
       
       ## Handle drawing and download of Data Table
-      tabdat = spread_(out_rte, "Product", "Spend")
+      tabdat = spread_(curdat, "Product", "Spend")
       output$rinsTable = renderDataTable(tabdat)
       output$rinsTableDown = tableComboDown(tabdat, "IndustrySectors")
    })
@@ -886,19 +1036,28 @@ icas = function(env_serv) with(env_serv, {
 })
 
 isvm = function(env_serv) with(env_serv, {
-   all_levels = env_rte$all_rte_levels
-   
    observe({
-      isvmDest = condInputServer(input, "isvmDest", env_rte$compcatRTR, cond_simple = "isvmRTR")
-      isvmOrigin = switch(input$isvmdomint,
-         Domestic = levelsOrigin$Domestic[-1],
-         International = levelsOrigin$International[-1]
+      # domint = input$isvmdomint
+      domint = "International"
+      isvmDest = condInputServer(input, "isvmDest", MVareaclass, cond_simple = "isvmRTR")
+      isvmOrigin = switch(domint,
+         Domestic = MVoriginslist$Domestic[-1],
+         International = MVoriginslist$International[-1]
       )
-      flist = list(YEMar = input$isvmYear, Origin = isvmOrigin, Product = all_levels$Product[-1])
+      flist = list(YearEnded = input$isvmYear, Origin = isvmOrigin, Product = MVproducts[-1])
       isvmRTR = input$isvmRTR
       flist[[isvmRTR]] = isvmDest
       
-      out_rte = getdat(env_rte$all_rte, "Product", "Origin", "Spend", flist)
+      curdat = (if(domint == "All") MVYE else filter(MVYE, Type == domint)) %>%
+         getdat("Product", "Origin", "Spend", flist)
+      
+      ## Order by size
+      lsum = curdat %>%
+         group_by(Origin) %>%
+         summarise(Spend = sum(Spend)) %>%
+         arrange(desc(Spend))
+      lorder = as.character(lsum$Origin)
+      curdat$Origin = factor(curdat$Origin, levels = lorder)
       
       scaled = input$isvmScaled == "sv"
       plist = list(x = "Origin", y = "Spend", fill = "Product")
@@ -906,99 +1065,124 @@ isvm = function(env_serv) with(env_serv, {
       titles$y = if(scaled) "Percentage of spend" else "Visitor spend ($ millions)"
       ttips = c(prefix = "$", suffix = "m")
       ggshiny = if(scaled) "isvmggsv" else "isvmggdv"
-      ggstackbar(out_rte, plist, titles, ttips, scaled) %>% bind_shiny(ggshiny)
+      ggstackbar(curdat, plist, titles, ttips, scaled) %>% bind_shiny(ggshiny)
       
       ## Title
       output$isvmggTitle = ggvisTitle("Spend by product from visitors of ",
-         tolower(input$isvmdomint), " origin for ", isvmDest,
-         " (year ended March ", input$isvmYear, ")")
+         tolower(domint), " origin for ", isvmDest,
+         " (year ended ", MVYE_str, " ", input$isvmYear, ")")
    })
 })
 
 vmorigin = function(env_serv) with(env_serv, {
-   all_levels = env_rte$all_rte_levels
    observe({
-      vmOriginOne = condInputServer(input, "vmOriginOne", env_rte$compcatRTR, cond_simple = "vmOriginclass")
-      vmOriginList = switch(input$vmOrigindomint,
-         All = all_levels$Origin[1],
-         Domestic = input$vmOriginListDomestic,
+      domint = input$vmOrigindomint
+      vmOriginOne = condInputServer(input, "vmOriginOne", MVareaclass, cond_simple = "vmOriginclass")
+      vmOriginList = switch(domint,
+         All = MVoriginsAll[1],
+         # Domestic = input$vmOriginListDomestic,
+         Domestic = MVoriginslist$Domestic[1],
          International = input$vmOriginListInternational
       )
       vmOriginScale = input$vmOriginScale
       ## If scaled values, remove Totals from vmOriginList
       if(vmOriginScale == "sv" && length(grep("^Total", vmOriginList)) > 0){
          if(length(vmOriginList) == 1)
-            vmOriginList = switch(input$vmOrigindomint,
-               All = c(levelsOrigin$Domestic[1], levelsOrigin$International[1]),
-               Domestic = levelsOrigin$Domestic[-1],
-               International = levelsOrigin$International[-1]
+            vmOriginList = switch(domint,
+               All = vmOriginList,
+               Domestic = MVoriginslist$Domestic[-1],
+               International = MVoriginslist$International[-1]
             )
          else
             vmOriginList = vmOriginList[-grep("^Total", vmOriginList)]
+      }
+      
+      vmdat = function(flist){
+         if(domint == "All"){
+            if(vmOriginScale == "sv"){
+               ## Must compute totals of Domestic and International separately
+               flist$Origin = MVoriginslist$Domestic[1]
+               dat_dom = filter(MVYE, Type == "Domestic") %>%
+                  getdat("YearEnded", "Origin", "Spend", flist)
+               flist$Origin = MVoriginslist$International[1]
+               dat_int = filter(MVYE, Type == "International") %>%
+                  getdat("YearEnded", "Origin", "Spend", flist)
+               curdat = rbind(dat_dom, dat_int)
+            } else{
+               curdat = MVYE %>%
+                  getdat("YearEnded", "Origin", "Spend", flist)
+            }
+         } else{
+            curdat = filter(MVYE, Type == domint) %>%
+               getdat("YearEnded", "Origin", "Spend", flist)
+         }
+         curdat
       }
       
       if(length(vmOriginList) > 0){
          flist = list(Product = input$vmOriginProduct,
                       Origin = vmOriginList)
          flist[[input$vmOriginclass]] = vmOriginOne
-         raw_rte = getdat(env_rte$all_rte, "YEMar", "Origin", "Spend", flist)
-         pal = as.vector(paldy(levels(raw_rte$Origin), all_levels$Origin))
-         spread_rte = spread_(raw_rte, colnames(raw_rte)[2], colnames(raw_rte)[3])
+         curdat = vmdat(flist)
+         pal = as.vector(paldy(levels(curdat$Origin), MVoriginsAll))
+         spread_dat = spread_(curdat, colnames(curdat)[2], colnames(curdat)[3])
+         ## reorder columns
+         # spread_dat = cbind(spread_dat[1], spread_dat[vmOriginList])
          
          if(vmOriginScale == "sv"){
             ## Scale data
             flistTot = flist
-            flistTot[[input$vmOriginclass]] = all_levels[[input$vmOriginclass]][1]
-            tot_rte = getdat(env_rte$all_rte, "YEMar", input$vmOriginclass, "Spend", flistTot)
-            spread_rte = cbind(spread_rte[1],
-               apply(spread_rte[-1], 2, function(x) x/tot_rte$Spend * 100))
+            flistTot[[input$vmOriginclass]] = MVarealisttots[[input$vmOriginclass]][1]
+            tot_dat = getdat(MVYE, "YearEnded", input$vmOriginclass, "Spend", flistTot)
+            spread_dat = cbind(spread_dat[1],
+               apply(spread_dat[-1], 2, function(x) x/tot_dat$Spend * 100))
          }
          
-         curtitle = paste("Visitor spend in", input$vmOriginProduct,
-                          "in", vmOriginOne,
-                          "from", liststr(vmOriginList),
-                          "(year ended March)")
-         output$vmOriginPlot = rte_dyquick(spread_rte, pal, curtitle, "vmOriginLegend",
+         curtitle = paste0("Visitor spend in ", input$vmOriginProduct,
+                          " in ", vmOriginOne,
+                          " from ", liststr(vmOriginList),
+                          " (year ended ", MVYE_str, ")")
+         output$vmOriginPlot = rte_dyquick(spread_dat, pal, curtitle, "vmOriginLegend",
                                            stacked = vmOriginScale == "sv",
                                            dateWindow = isolate(input$vmOriginPlot_date_window))
       
          ## Handle drawing and download of Data Table
          if(vmOriginScale == "sv"){
             ## Round if percentages
-            spread_rte_table = cbind(spread_rte[1],
-               apply(spread_rte[-1], 2, function(x) round(x, 2)))
+            spread_dat_table = cbind(spread_dat[1],
+               apply(spread_dat[-1], 2, function(x) round(x, 2)))
          } else{
-            spread_rte_table = spread_rte
+            spread_dat_table = spread_dat
          }
-         output$vmOriginTable = renderDataTable(spread_rte,
+         output$vmOriginTable = renderDataTable(spread_dat,
             options = list(order = list(c("0", "desc"))))
-         output$vmOriginTableDown = tableComboDown(spread_rte, curtitle)
+         output$vmOriginTableDown = tableComboDown(spread_dat, curtitle)
       }
    })
    
    ## checkboxCombo
-   levelsOrigin = env_rte$levelsOrigin
-   catOrigin = env_rte$catOrigin
+   # condComboServer(input, session, "vmOriginList",
+                   # cats = MVorigins[-1],
+                   # choices = MVoriginslist)
    condComboServer(input, session, "vmOriginList",
-                   cats = catOrigin[-1],
-                   choices = levelsOrigin)
+                   cats = MVorigins[-c(1, 2)],
+                   choices = MVoriginslist)
 })
 vmdest = function(env_serv) with(env_serv, {
-   compcatRTR = env_rte$compcatRTR
-   all_levels = env_rte$all_rte_levels
-   
    observe({
-      vmDestList = condInputServer(input, "vmDestList", compcatRTR, cond_simple = "vmDestclass")
-      vmDestOrigin = switch(input$vmDestdomint,
-         All = all_levels$Origin[1],
-         Domestic = input$vmDestOriginDomestic,
+      domint = input$vmDestdomint
+      vmDestList = condInputServer(input, "vmDestList", MVareaclass, cond_simple = "vmDestclass")
+      vmDestOrigin = switch(domint,
+         All = MVoriginsAll[1],
+         # Domestic = input$vmDestOriginDomestic,
+         Domestic = MVoriginslist$Domestic[1],
          International = input$vmDestOriginInternational
       )
       vmDestScale = input$vmDestScale
       ## If scaled values, remove Totals from vmDestList
       if(vmDestScale == "sv" && length(grep("^Total", vmDestList)) > 0){
          if(length(vmDestList) == 1)
-            vmDestList = all_levels[[input$vmDestclass]][-1]
+            vmDestList = MVarealisttots[[input$vmDestclass]][-1]
          else
             vmDestList = vmDestList[-grep("^Total", vmDestList)]
       }
@@ -1007,45 +1191,47 @@ vmdest = function(env_serv) with(env_serv, {
          flist = list(Origin = vmDestOrigin,
                       Product = input$vmDestProduct)
          flist[[input$vmDestclass]] = vmDestList
-         raw_rte = getdat(env_rte$all_rte, "YEMar", input$vmDestclass, "Spend", flist)
-         pal = as.vector(paldy(levels(raw_rte[[input$vmDestclass]]), all_levels[[input$vmDestclass]]))
-         spread_rte = spread_(raw_rte, colnames(raw_rte)[2], colnames(raw_rte)[3])
+         curdat = (if(domint == "All") MVYE else filter(MVYE, Type == domint)) %>%
+            getdat("YearEnded", input$vmDestclass, "Spend", flist)
+         pal = as.vector(paldy(levels(curdat[[input$vmDestclass]]), MVarealisttots[[input$vmDestclass]]))
+         spread_dat = spread_(curdat, colnames(curdat)[2], colnames(curdat)[3])
          
          if(vmDestScale == "sv"){
             ## Scale data
             flistTot = flist
-            flistTot[[input$vmDestclass]] = all_levels[[input$vmDestclass]][1]
-            tot_rte = getdat(env_rte$all_rte, "YEMar", input$vmDestclass, "Spend", flistTot)
-            spread_rte = cbind(spread_rte[1],
-               apply(spread_rte[-1], 2, function(x) x/tot_rte$Spend * 100))
+            flistTot[[input$vmDestclass]] = MVarealisttots[[input$vmDestclass]][1]
+            tot_dat = (if(domint == "All") MVYE else filter(MVYE, Type == domint)) %>%
+               getdat("YearEnded", input$vmDestclass, "Spend", flistTot)
+            spread_dat = cbind(spread_dat[1],
+               apply(spread_dat[-1], 2, function(x) x/tot_dat$Spend * 100))
          }
          
-         curtitle = paste(vmDestOrigin, "visitor spend in",
+         curtitle = paste0(vmDestOrigin, " visitor spend in ",
                           input$vmDestProduct,
-                          "in", liststr(vmDestList),
-                          "(year ended March)")
-         output$vmDestPlot = rte_dyquick(spread_rte, pal, curtitle, "vmDestLegend",
+                          " in ", liststr(vmDestList),
+                          " (year ended ", MVYE_str, ")")
+         output$vmDestPlot = rte_dyquick(spread_dat, pal, curtitle, "vmDestLegend",
                                          stacked = vmDestScale == "sv",
                                          dateWindow = isolate(input$vmDestPlot_date_window))
       
          ## Handle drawing and download of Data Table
          if(vmDestScale == "sv"){
             ## Round if percentages
-            spread_rte_table = cbind(spread_rte[1],
-               apply(spread_rte[-1], 2, function(x) round(x, 2)))
+            spread_dat_table = cbind(spread_dat[1],
+               apply(spread_dat[-1], 2, function(x) round(x, 2)))
          } else{
-            spread_rte_table = spread_rte
+            spread_dat_table = spread_dat
          }
-         output$vmDestTable = renderDataTable(spread_rte_table,
+         output$vmDestTable = renderDataTable(spread_dat_table,
             options = list(order = list(c("0", "desc"))))
-         output$vmDestTableDown = tableComboDown(spread_rte, curtitle)
+         output$vmDestTableDown = tableComboDown(spread_dat, curtitle)
       }
    })
    
    ## checkboxCombo
    condComboServer(input, session, "vmDestList",
-                   cats = compcatRTR,
-                   choices = all_levels)
+                   cats = MVareaclass,
+                   choices = MVarealisttots)
 })
 
 vmacc = function(env_serv) with(env_serv, {
@@ -1098,10 +1284,11 @@ vmacc = function(env_serv) with(env_serv, {
 
 gcforex = function(env_serv) with(env_serv, {
    ## Global Context - Exchange Rates
-   env_forex = new.env()
+   ## Always use fallback for efficiency
+   # env_forex = new.env()
+   env_forex = env_forex_fallback
    
    observe({
-      # input = list(gcforexCurrency = "AUD", gcforexIndex = "2011")
       curfx = input$gcforexCurrency
       IndexDate = paste0(as.numeric(input$gcforexIndex), "-12-31")
       
@@ -1123,42 +1310,18 @@ gcforex = function(env_serv) with(env_serv, {
       dat_forex = data.frame(index(curxts), xts_num)
       names(dat_forex) = c("TimePeriod", curfx)
       
-      dat_merge = dat_forex
-      
+      ######################
+      ## Spend & Arrivals ##
+      ######################
       ivs_country = fx_currency_to_ivs[[curfx]]
-      for(cur_country in ivs_country){
-         flist = list(Type = "Country of residence", Dimension = cur_country)
-         ################
-         ## Spend data ##
-         ################
-         flist$Variable = "Total spend"
-         dat_spend = getdat(ivs, "TimePeriod", "Dimension", "Value", flist) %>%
-            filter(TimePeriod >= fx_date_leadin) %>%
-            mutate(Value = rollmean(Value, 4, fill = NA, align = "right")) %>%
-            filter(TimePeriod >= fx_date_start, !is.na(Value)) %>%
-            mutate(Value = Value/mean(Value[TimePeriod == IndexDate]) * 100) %>%
-            spread(Dimension, Value)
-         names(dat_spend) = c("TimePeriod", paste0("Total spend (", cur_country, ")"))
-         
-         ###################
-         ## Arrivals data ##
-         ###################
-         flist$Variable = "Arrivals"
-         dat_arriv = getdat(arriv, "TimePeriod", "Dimension", "Value", flist) %>%
-            filter(TimePeriod >= fx_date_leadin) %>%
-            mutate(Value = rollmean(Value, 12, fill = NA, align = "right")) %>%
-            filter(TimePeriod >= fx_date_start, !is.na(Value)) %>%
-            mutate(Value = Value/mean(Value[TimePeriod == IndexDate]) * 100) %>%
-            spread(Dimension, Value)
-         names(dat_arriv) = c("TimePeriod", paste0("Arrivals (", cur_country, ")"))
-         
-         ################
-         ## Merge Data ##
-         ################
-         dat_merge = merge(dat_merge, merge(dat_spend, dat_arriv, all = TRUE), all = TRUE)
-      }
+      dat_part = get_spend_arriv_dat(ivs_country, fx_all_years[1], IndexDate)
+      
+      ################
+      ## Merge Data ##
+      ################
+      dat_merge = merge(dat_forex, dat_part, all = TRUE)
       xts_merge = xts(dat_merge[-1], dat_merge$TimePeriod)
-      pal = paldy(names(dat_merge), names(dat_merge))
+      pal = paldy(names(xts_merge), names(xts_merge))
       
       curtitle = paste("Index of NZD bought with", curfx,
          "vs total spend and arrivals from", liststr(ivs_country))
@@ -1170,5 +1333,120 @@ gcforex = function(env_serv) with(env_serv, {
       output$gcforexTable = renderDataTable(tabdat,
          options = list(order = list(c("0", "desc"))))
       output$gcforexTableDown = tableComboDown(tabdat, "NZD_forex")
+   })
+})
+
+ecshare = function(env_serv) with(env_serv, {
+   ## Economic Context - Tourism-related Share Prices
+   
+   ## Prepare Total Spend and Arrivals data
+   ecasdat = local({
+      flist = list(Type = "Country of residence", Dimension = all_countries[1])
+      date_leadin = paste0(as.numeric(shares_all_years[1]) - 1, "-01-01")
+      
+      ################
+      ## Spend data ##
+      ################
+      flist$Variable = "Total spend"
+      dat_spend = getdat(ivs, "TimePeriod", "Dimension", "Value", flist) %>%
+         filter(TimePeriod >= date_leadin) %>%
+         mutate(Value = rollmean(Value, 4, fill = NA, align = "right")) %>%
+         filter(!is.na(Value)) %>%
+         select(TimePeriod, Spend = Value)
+      
+      ###################
+      ## Arrivals data ##
+      ###################
+      flist$Variable = "Arrivals"
+      dat_arriv = getdat(arriv, "TimePeriod", "Dimension", "Value", flist) %>%
+         filter(TimePeriod >= date_leadin) %>%
+         mutate(Value = rollmean(Value, 12, fill = NA, align = "right")) %>%
+         filter(!is.na(Value)) %>%
+         select(TimePeriod, Arrivals = Value)
+      
+      ################
+      ## Merge Data ##
+      ################
+      merge(dat_spend, dat_arriv, all = TRUE)
+   })
+   
+   observe({
+      if(length(input$ecsharechk) > 0){
+         shares_index = apply(shares_adj[,input$ecsharechk], 2, function(x) x/x[index(shares_adj) == input$ecshareIndex] * 100)
+         shares_xts = xts(shares_index, index(shares_adj))
+         
+         eoy_indexdate = paste0(as.numeric(format(as.Date(input$ecshareIndex), "%Y")) - 1, "-12-31")
+         ecas_index = ecasdat %>%
+            mutate(Spend = Spend/Spend[TimePeriod == eoy_indexdate] * 100,
+                   Arrivals = Arrivals/Arrivals[TimePeriod == eoy_indexdate] * 100)
+         ecas_xts = xts(ecas_index[c("Spend", "Arrivals")], ecas_index$TimePeriod)
+         
+         dat_merge = merge(shares_xts, ecas_xts, all = TRUE)
+         pal = paldy(names(dat_merge), c(shares_names, "Spend", "Arrivals"))
+         
+         curtitle = paste("Index of tourism-related share prices")
+         output$ecsharedy = dyforex(dat_merge, curtitle, pal, "ecsharedyLegend",
+                                    isolate(input$ecsharedy_date_window))
+      
+         ## Handle drawing and download of Data Table
+         tabdat = cbind(Date = as.character(index(dat_merge)), as.data.frame(dat_merge))
+         output$ecshareTable = renderDataTable(tabdat,
+            options = list(order = list(c("0", "desc"))))
+         output$ecshareTableDown = tableComboDown(tabdat, "Tourism-related_share_prices")
+      }
+   })
+   
+   checkboxComboServer(input, session, "ecsharechk", shares_names)
+})
+
+ecgrof = function(env_serv) with(env_serv, {
+   ## Economic Context - Economic Growth Forecasts
+   observe({
+      curCountry = input$ecgrofCountry
+      IndexDate = paste0(as.numeric(input$ecgrofIndex), "-12-31")
+      
+      ###################
+      ## Economic data ##
+      ###################
+      dat_eco = imf_weo %>%
+         mutate(TimePeriod = as.Date(paste0(Year, "-12-31"))) %>%
+         filter(Country %in% c(curCountry, "New Zealand")) %>%
+         group_by(Country) %>%
+         mutate(Value = Value/Value[TimePeriod == IndexDate] * 100) %>%
+         ungroup()
+      dat_base = dat_eco %>%
+         mutate(Country = ifelse(Year >= EstFrom, paste(Country, "(forecast)"), as.character(Country)))
+      dat_repeat = dat_eco %>%
+         filter(Year == EstFrom)
+      dat_ecoFinal = rbind(dat_base, dat_repeat) %>%
+         select(-Year, -EstFrom) %>%
+         spread(Country, Value)
+      
+      ######################
+      ## Spend & Arrivals ##
+      ######################
+      ivs_country = weo_ctoivs[[curCountry]]
+      dat_spend_arriv = get_spend_arriv_dat(ivs_country, min(weo_years), IndexDate)
+      
+      ################
+      ## Merge Data ##
+      ################
+      dat_merge = merge(dat_ecoFinal, dat_spend_arriv, all = TRUE)
+      xts_merge = xts(dat_merge[-1], dat_merge$TimePeriod)
+      ## Manually set pal name order for consistent colour
+      palnames = c(paste0("New Zealand", c("", " (forecast)")),
+                   paste0(curCountry, c(" (forecast)", "")),
+                   "Total spend", "Arrivals")
+      pal = paldy(names(dat_merge), palnames)
+      
+      curtitle = paste("Index of GDP",
+         "vs total spend and arrivals from", curCountry)
+      output$ecgrofdy = dyforex(xts_merge, curtitle, pal, "ecgrofdyLegend",
+                                 isolate(input$ecgrofdy_date_window))
+   
+      ## Handle drawing and download of Data Table
+      output$ecgrofTable = renderDataTable(dat_merge,
+         options = list(order = list(c("0", "desc"))))
+      output$ecgrofTableDown = tableComboDown(dat_merge, curtitle)
    })
 })

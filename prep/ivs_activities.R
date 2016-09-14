@@ -18,7 +18,7 @@ ivs_act = function(dataset_names){
 					surveyresponseID,
 					activitycategory
 				from
-					vw_ivsactivities
+					Production.vw_ivsactivities
             where
                activity not in ('None of these', 'Not sure')
 				group by
@@ -30,7 +30,7 @@ ivs_act = function(dataset_names){
 		group_by(surveyresponseID) %>% 
 		summarise(activitycategory = paste(activitycategory, collapse = ","))
 
-	main <- sqlQuery(TRED, "SELECT * FROM vw_ivssurveymainheader")
+	main <- sqlQuery(TRED, "SELECT * FROM Production.vw_ivssurveymainheader")
 
 	ivs_act_raw <- sqldf::sqldf(
 		"select
@@ -88,7 +88,7 @@ ivs_act = function(dataset_names){
       activity,
       activitycategory
    from
-      vw_ivsactivities
+      Production.vw_ivsactivities
    where
       activity not in ('None of these', 'Not sure')
    group by

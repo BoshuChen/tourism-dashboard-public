@@ -15,7 +15,9 @@ tabdesc = c(
    "Visitor Spend by Origin" = "This tab shows annual spend by international and domestic visitors by tourism product, for regions, RTOs and territorial authorities. You can compare between domestic origins by region, or international origins by country.",
    "Visitor Spend by Destination" = "This tab shows annual spend by international and domestic visitors by tourism product, for regions, RTOs and territorial authorities. You can compare between destinations by region, RTO or territorial authority.",
    "Accommodation Used" = "This tab shows visitors over a three-year period by country and detailed type of accommodation used.",
-   "Exchange Rates" = "This tab shows daily indexes of exchange rates for our major tourism markets, compared with the number of arrivals and total spend from those markets."
+   "Exchange Rates" = "This tab shows daily indexes of exchange rates for our major tourism markets, compared with the number of arrivals and total spend from those markets.",
+   "Tourism-related Share Prices" = "This tab shows daily indexes of share prices for New Zealand's main tourism-related publically listed companies, compared with total arrivals and tourism spend.",
+   "Main Market GDP" = "This tab shows historical gross domestic product for our main markets, along with latest available forecasts, compared with the number of arrivals and total spend from those markets."
 )
 
 frontp = function() div(class = "frontp",
@@ -27,7 +29,7 @@ frontp = function() div(class = "frontp",
    tags$p(class = "intro", "The New Zealand Tourism Dashboard is a one-stop shop for all information about tourism. It brings together a range of tourism datasets produced by MBIE and Statistics New Zealand into one easy-to-use tool. Information is presented using dynamic graphs and data tables."),
    div(class = "intro-divider"),
    tags$p("Main subject-area groupings of tourism data are shown on the toolbar above. To navigate around this site, left-click one of the subject areas and then select one of the related categories in the drop down list."),
-   tags$p("Graphs can be downloaded as PDFs and tables can be downloaded to a csv file. Information on how to use the graphs and tables, along with an example, is available in the",
+   tags$p("Graphs can be downloaded as png and tables can be downloaded to a csv file. Information on how to use the graphs and tables, along with an example, is available in the",
       tags$a("Help", title = "Help Tab", href = "#", id = "HelpTabLink"), "tab.",
       tags$script("$('#HelpTabLink').click(function(){$('a[data-value=\"Help\"]')[0].click();});")
    ),

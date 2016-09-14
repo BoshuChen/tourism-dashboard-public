@@ -7,6 +7,7 @@ source("ga_Rfuncs.R")
 shinyUI(
    dashboardPage("New Zealand Tourism Dashboard", thead = tagList(
       tags$head(
+         HTML('<link rel="canonical" href="http://tourismdashboard.mbie.govt.nz/"/>'),
          includeCSS("mbie-styles.css"),
          includeCSS("tdstyles.css"),
          tags$script(src = "jszip.min.js"),
@@ -91,9 +92,15 @@ shinyUI(
          vmacc()
       )
    ),
-   navbarMenu("Global Context",
+   navbarMenu("Economic Context",
       tabPwT("Exchange Rates",
          gcforex()
+      ),
+      tabPwT("Tourism-related Share Prices",
+         ecshare()
+      ),
+      tabPwT("Main Market GDP",
+         ecgrof()
       )
    ),
    tabPwT("Help",

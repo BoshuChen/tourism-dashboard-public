@@ -124,65 +124,64 @@ oivas = function() tagList(
 )
 
 rs_all = function() tagList(
-   div(class = "float divwell", style = paste0("height: ", (500 + 500 + 250) + 300, "px;"),
+   div(class = "float divwell",
       tags$form(class = "well",
-         radioButtons("rsAreaClass", "Regional level:", rs_data$areaclass),
-         condInputs("rsAreaSub", cats = rs_data$areaclass,
-                    choices = rs_data$arealist,
+         radioButtons("rsAreaClass", "Regional level:", MVareaclass),
+         condInputs("rsAreaSub", cats = MVareaclass,
+                    choices = MVarealist,
                     type = "selectInputF",
-                    cond_simple = "rsAreaClass"),
-         selectInputF("rstsBase", "Set Time Series base index period (12 months ending...)", rs_data$allPeriods[-(1:11)], rs_data$allPeriods[12]),
-         # dyDownloadGroup("rstsDownloads", "Download Time Series Plots:", c(
-            # "International" = "rstsint",
-            # "Domestic" = "rstsdom"
-         # )),
-         downloadButton("rspdf", label = "Download as PDF report")
+                    cond_simple = "rsAreaClass")
+         # downloadButton("rspdf", label = "Download as PDF report")
       )
    ),
-   ## COL 1
-   div(class = "float divplot divfix700",
-      ## ROW 1
-      div(id = "rstsintlabels", class = "float dylegend divplothalf-label"),
-      ## TimeSeries International
-      div(class = "float divfull",
-         dygraphOutput("rstsint", height = 500)
+   div(class = "float divplot",
+      ## COL 1
+      div(class = "float divflex",
+         ## ROW 1
+         div(id = "rstsintlabels", class = "float dylegend divplothalf-label"),
+         ## TimeSeries International
+         div(class = "float divfull",
+            dygraphOutput("rstsint", height = 500)
+         ),
+         ## ROW 2
+         ## Spend By Origin Dotchart International
+         div(class = "float divfull",
+            uiOutput("rsoriginintTitle"),
+            ggvisOutput("rsoriginint")
+         ),
+         ## ROW 3
+         ## Spend By Product Dotchart International
+         div(class = "float divfull",
+            uiOutput("rsproductintTitle"),
+            ggvisOutput("rsproductint")
+         )
       ),
-      ## ROW 2
-      ## Spend By Origin Dotchart International
-      div(class = "float divfull",
-         uiOutput("rsoriginintTitle"),
-         ggvisOutput("rsoriginint")
+      ## COL 2
+      div(class = "float divflex",
+         ## ROW 1
+         div(id = "rstsdomlabels", class = "float dylegend divplothalf-label"),
+         ## TimeSeries Domestic
+         div(class = "float divfull",
+            dygraphOutput("rstsdom", height = 500)
+         ),
+         ## ROW 2
+         ## Spend By Origin Dotchart Domestic
+         div(class = "float divfull",
+            style = "height: 548px;", # TEMPORARY HEIGHT TO FILL SPACE
+            uiOutput("rsorigindomTitle"),
+            ggvisOutput("rsorigindom")
+         ),
+         ## ROW 3
+         ## Spend By Product Dotchart Domestic
+         div(class = "float divfull",
+            uiOutput("rsproductdomTitle"),
+            ggvisOutput("rsproductdom")
+            # highchartOutput("rsproductdom", height = 350)
+         )
       ),
-      ## ROW 3
-      ## Spend By Product Dotchart International
       div(class = "float divfull",
-         uiOutput("rsproductintTitle"),
-         ggvisOutput("rsproductint")
+         datasource2(MVmod)
       )
-   ),
-   ## COL 2
-   div(class = "float divplot divfix700",
-      ## ROW 1
-      div(id = "rstsdomlabels", class = "float dylegend divplothalf-label"),
-      ## TimeSeries Domestic
-      div(class = "float divfull",
-         dygraphOutput("rstsdom", height = 500)
-      ),
-      ## ROW 2
-      ## Spend By Origin Dotchart Domestic
-      div(class = "float divfull",
-         uiOutput("rsorigindomTitle"),
-         ggvisOutput("rsorigindom")
-      ),
-      ## ROW 3
-      ## Spend By Product Dotchart Domestic
-      div(class = "float divfull",
-         uiOutput("rsproductdomTitle"),
-         ggvisOutput("rsproductdom")
-      )
-   ),
-   div(class = "float",
-      datasource2(rs_data)
    )
 )
 
@@ -241,13 +240,14 @@ fixedRow(
    tableCombo("racccamTable")
 ))
 
-rins = function() with(env_rte, tagList(
+rins = function() tagList(
 fixedRow(
    div(class = "float divwell", tags$form(class = "well",
-      selectInputF("rinsYear", "Year Ended March:", sort(unique(all_rte$YEMar), decreasing = TRUE)),
-      radioButtons("rinsRTR", "Select Regional Level:", compcatRTR),
-      radioButtons("rinsdomint", "Choose Origin:", catOrigin),
-      condInputs("rinsOrigin", catOrigin[-1], levelsOrigin, "selectInputF", cond_simple = "rinsdomint"),
+      selectInputF("rinsYear", paste0("Year Ended ", MVYE_str, ":"), rev(MVYEyears)),
+      radioButtons("rinsRTR", "Select Regional Level:", MVareaclass),
+      radioButtons("rinsdomint", "Choose Origin:", MVorigins),
+      # condInputs("rinsOrigin", MVorigins[-1], MVoriginslist, "selectInputF", cond_simple = "rinsdomint"),
+      condInputs("rinsOrigin", MVorigins[-c(1, 2)], MVoriginslist, "selectInputF", cond_simple = "rinsdomint"),
       radioButtons("rinsScaled", "Choose what to plot:", catscale)
    )),
    div(class = "float divplot",
@@ -258,11 +258,12 @@ fixedRow(
       conditionalPanel('input.rinsScaled == "dv"',
          ggvisOutput("rinsggdv")
       ),
-      datasource2(all_rte)
+      # highchartOutput("rinshc", height = 600),
+      datasource2(MVmod)
    )
 ), fixedRow(
    tableCombo("rinsTable")
-)))
+))
 
 rgdp = function() tagList(
 fixedRow(
@@ -481,12 +482,12 @@ icas = function() tagList(
    div(class = "float align-well", datasource2(all_cas))
 )
 
-isvm = function() with(env_rte, tagList(
+isvm = function() tagList(
    div(class = "float divwell", tags$form(class = "well",
-      selectInputF("isvmYear", "Year Ended March:", sort(unique(all_rte$YEMar), decreasing = TRUE)),
-      radioButtons("isvmdomint", "Choose Origin:", catOrigin[-1], catOrigin[3]),
-      radioButtons("isvmRTR", "Select Destination:", compcatRTR),
-      condInputs("isvmDest", compcatRTR, all_rte_levels, "selectInputF", cond_simple = "isvmRTR"),
+      selectInputF("isvmYear", paste0("Year Ended ", MVYE_str, ":"), rev(MVYEyears)),
+      # radioButtons("isvmdomint", "Choose Origin:", MVorigins[-1], MVorigins[3]),
+      radioButtons("isvmRTR", "Select Destination:", MVareaclass),
+      condInputs("isvmDest", MVareaclass, MVarealisttots, "selectInputF", cond_simple = "isvmRTR"),
       radioButtons("isvmScaled", "Choose what to plot:", catscale)
    )),
    div(class = "float divplot",
@@ -497,21 +498,22 @@ isvm = function() with(env_rte, tagList(
       conditionalPanel('input.isvmScaled == "dv"',
          ggvisOutput("isvmggdv")
       ),
-      datasource2(all_rte)
+      datasource2(MVmod)
    )
-))
+)
 
-vmorigin = function() with(env_rte, tagList(
+vmorigin = function() tagList(
 fixedRow(
    div(class = "float divwell", tags$form(class = "well",
       div(class = "divinput",
          tags$h3("Show/Hide"),
          div(
-            selectInputF("vmOriginProduct", "Choose the Product:", all_rte_levels$Product),
-            radioButtons("vmOriginclass", "Select destination:", compcatRTR),
-            condInputs("vmOriginOne", compcatRTR, all_rte_levels, "selectInputF", cond_simple = "vmOriginclass"),
-            radioButtons("vmOrigindomint", "Choose Origin:", catOrigin),
-            condInputs("vmOriginList", catOrigin[-1], levelsOrigin, "checkboxComboInput", cond_simple = "vmOrigindomint")
+            selectInputF("vmOriginProduct", "Choose the Product:", MVproducts),
+            radioButtons("vmOriginclass", "Select destination:", MVareaclass),
+            condInputs("vmOriginOne", MVareaclass, MVarealisttots, "selectInputF", cond_simple = "vmOriginclass"),
+            radioButtons("vmOrigindomint", "Choose Origin:", MVorigins),
+            # condInputs("vmOriginList", MVorigins[-1], MVoriginslist, "checkboxComboInput", cond_simple = "vmOrigindomint")
+            condInputs("vmOriginList", MVorigins[-c(1, 2)], MVoriginslist, "checkboxComboInput", cond_simple = "vmOrigindomint")
          )
       ),
       radioButtons("vmOriginScale", "Choose what to plot:", catscale),
@@ -520,25 +522,25 @@ fixedRow(
    div(class = "float divplot",
       dyDownload("vmOriginPlot", "Download Plot", asbutton = TRUE),
       dygraphOutput("vmOriginPlot", height = 600),
-      datasource2(all_rte)
+      datasource2(MVmod)
    )
 ), fixedRow(
    tableCombo("vmOriginTable")
-)))
+))
 
-vmdest = function() with(env_rte, tagList(
+vmdest = function() tagList(
 fixedRow(
    div(class = "float divwell", tags$form(class = "well",
       div(class = "divinput",
          tags$h3("Show/Hide"),
          div(
-            radioButtons("vmDestdomint", "Choose Origin:", catOrigin),
-            condInputs("vmDestOrigin", catOrigin[-1], levelsOrigin, "selectInputF", cond_simple = "vmDestdomint"),
-            selectInputF("vmDestProduct", "Choose the Product:", all_rte_levels$Product),
-            radioButtons("vmDestclass", "Select destination:", compcatRTR),
-            condInputs("vmDestList", compcatRTR, all_rte_levels, "checkboxComboInput",
-                       labels = c("Regions", "RTOs", "Territorial Authorities"),
-                       cond_simple = "vmDestclass")
+            radioButtons("vmDestdomint", "Choose Origin:", MVorigins),
+            # condInputs("vmDestOrigin", MVorigins[-1], MVoriginslist, "selectInputF", cond_simple = "vmDestdomint"),
+            condInputs("vmDestOrigin", MVorigins[-c(1, 2)], MVoriginslist, "selectInputF", cond_simple = "vmDestdomint"),
+            selectInputF("vmDestProduct", "Choose the Product:", MVproducts),
+            radioButtons("vmDestclass", "Select destination:", MVareaclass),
+            condInputs("vmDestList", MVareaclass, MVarealisttots, "checkboxComboInput",
+                       labels = MVareaclass_s, cond_simple = "vmDestclass")
          )
       ),
       radioButtons("vmDestScale", "Choose what to plot:", catscale),
@@ -547,11 +549,11 @@ fixedRow(
    div(class = "float divplot",
       dyDownload("vmDestPlot", "Download Plot", asbutton = TRUE),
       dygraphOutput("vmDestPlot", height = 600),
-      datasource2(all_rte)
+      datasource2(MVmod)
    )
 ), fixedRow(
    tableCombo("vmDestTable")
-)))
+))
 
 vmacc = function() tagList(
 fixedRow(
@@ -580,9 +582,7 @@ fixedRow(
       div(class = "divinput",
          tags$h3("Show/Hide"),
          div(
-            helpText(paste("The first time a currency is added,",
-               "there will be a delay as we retrieve the latest exchange rates.")),
-            selectInputF("gcforexCurrency", "Currencies to compare", fx_currencies),
+            selectInputF("gcforexCurrency", "Select a Currency:", fx_currencies),
             div(class = "jui-tip",
                title = "Index = 100 at the end of the Index Year",
                selectInputF("gcforexIndex", "Index Year", fx_all_years)
@@ -598,4 +598,52 @@ fixedRow(
    )
 ), fixedRow(
    tableCombo("gcforexTable")
+))
+
+ecshare = function() tagList(
+fixedRow(
+   div(class = "float divwell", tags$form(class = "well",
+      div(class = "divinput",
+         tags$h3("Show/Hide"),
+         div(
+            checkboxComboInput("ecsharechk", "Select Companies:", shares_names, TRUE),
+            div(class = "jui-tip",
+               title = "Index = 100 at the end of the Index Year",
+               selectInputF("ecshareIndex", "Index Year", shares_index_dates)
+            )
+         )
+      ),
+      div(id = "ecsharedyLegend", class = "dylegend")
+   )),
+   div(class = "float divplot",
+      dyDownload("ecsharedy", "Download Plot", asbutton = TRUE),
+      dygraphOutput("ecsharedy", height = 600),
+      datasource("Adjusted Close Prices, Yahoo Finance, using the R package quantmod")
+   )
+), fixedRow(
+   tableCombo("ecshareTable")
+))
+
+ecgrof = function() tagList(
+fixedRow(
+   div(class = "float divwell", tags$form(class = "well",
+      div(class = "divinput",
+         tags$h3("Show/Hide"),
+         div(
+            selectInputF("ecgrofCountry", "Select a Country:", weo_countries),
+            div(class = "jui-tip",
+               title = "Index = 100 at the end of the Index Year",
+               selectInputF("ecgrofIndex", "Index Year", weo_years)
+            )
+         )
+      ),
+      div(id = "ecgrofdyLegend", class = "dylegend")
+   )),
+   div(class = "float divplot",
+      dyDownload("ecgrofdy", "Download Plot", asbutton = TRUE),
+      dygraphOutput("ecgrofdy", height = 600),
+      datasource2(imf_weo)
+   )
+), fixedRow(
+   tableCombo("ecgrofTable")
 ))

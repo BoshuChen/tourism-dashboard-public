@@ -45,8 +45,8 @@ shinydir = "shiny/new"
 ## e.g. "new"  -> https://mbienz.shinyapps.io/tourism_dashboard_new
 ##      "prod" -> https://mbienz.shinyapps.io/tourism_dashboard_prod
 ## If deploysuffix = NULL, shiny app is not deployed
-deploysuffix = "test" # ie test environment.  This used to be called "new"
-# deploysuffix = "prod"
+#deploysuffix = "test" # ie test environment.  This used to be called "new"
+deploysuffix = "prod"
 # deploysuffix = NULL
 
 ##########################
@@ -139,10 +139,20 @@ defdata = list(
       provider = "MBIE",
       URL = "http://www.mbie.govt.nz/info-services/sectors-industries/tourism/tourism-research-data/regional-tourism-indicators"
    ),
+   MRTE = list(
+      long = "Monthly Regional Tourism Estimates",
+      provider = "MBIE",
+      URL = "http://www.mbie.govt.nz/info-services/sectors-industries/tourism/tourism-research-data/monthly-regional-tourism-estimates"
+   ),
    TSA = list(
       long = "Tourism Satellite Account",
       provider = "Statistics New Zealand",
       URL = "http://www.stats.govt.nz/browse_for_stats/industry_sectors/Tourism/tourism-satellite-account-info-releases.aspx"
+   ),
+   IMFWEO = list(
+      long = "World Economic Outlook Database",
+      provider = "International Monetary Fund",
+      URL = "http://www.imf.org/external/data.htm"
    )
 )
 ## Save the dataset definitions for access in shiny app
@@ -175,7 +185,6 @@ sourceprep("Accomm_RTO.R")
 Accomm_RTO("CAM")
 
 ## Industry - Activities
-## AM comment:  someone needs to fix the SQL code in ivs_activities.R so that it works in the MBIE environment
 sourceprep("ivs_activities.R")
 ivs_act("IVS")
 
@@ -197,8 +206,10 @@ ivs_accomm_used("IVS")
 ##    Visitor Markets - Compare Destinations
 ## Latest RTE data is not in TRED, thus this script pulls from a csv.gz file
 ## See: https://github.com/nz-mbie/tourism-dashboard/issues/57
+sourceprep("copy_MRTEs_from_P_to_local.R")
 sourceprep("RTE_data.R")
 RTE_data("RTE")
+
 
 ## Regions - Regional Summaries
 ## Uses both RTE and RTI data
@@ -218,6 +229,14 @@ rs_data(c("RTI", "RTE"))
 sourceprep("CAS_data.R")
 CAS_data("CAS")
 
+## IMF World Economic Outlook
+## Used for historic and forecast GDP data
+## Need to get latest manually from IMF's "World Economic Outlook database"
+## Downloading the "By Countries" version from:
+##  http://www.imf.org/external/pubs/ft/weo/2016/01/weodata/download.aspx
+sourceprep("IMF_WorldEconomicOutlook.R")
+IMF_WorldEconomicOutlook("IMFWEO")
+
 ## Create local forex data as fallback
 ## Used when `getFX` fails for some reason
 library(quantmod)
@@ -235,7 +254,7 @@ fx_currencies = c(
    "Chilean peso" = "CLP",
    "Argentine peso" = "ARS"
 )
-## Grab currencies for the latest 5 years, starting from January
+## Grab currencies for the latest 5 years, starting from December 31
 fx_all_years = as.numeric(format(Sys.time(), "%Y")) - 5:1
 fx_date_start = paste0(fx_all_years[1], "-12-31")
 ## Get data
@@ -247,6 +266,24 @@ for(curfx in fx_currencies){
 }
 save(env_forex_fallback, file = savepath("env_forex_fallback"))
 
+## Create local prepped version of share prices
+##  since there would be too many to do on-the-fly
+library(quantmod)
+shares_list = c("AIA.NZ", "AIR.NZ", "SKC.NZ", "THL.NZ", "^NZ50")
+## Grab shares for the latest 5 years, starting from January
+shares_date_start = paste0(as.numeric(format(Sys.time(), "%Y")) - 4, "-01-01")
+env_shares = new.env()
+getSymbols(shares_list,
+           from = shares_date_start, src = "yahoo",
+           env = env_shares, auto.assign = TRUE)
+shares_adj = do.call(cbind, lapply(env_shares, function(x) x[,grep(".+Adjusted", names(x))]))
+names(shares_adj) = gsub(".NZ", "", names(shares_adj), fixed = TRUE)
+names(shares_adj) = gsub(".Adjusted", "", names(shares_adj), fixed = TRUE)
+shares_adj = shares_adj[,sort(names(shares_adj))]
+## Fix NA values for NZX50
+if(is.na(shares_adj$NZ50[1])) shares_adj$NZ50[1] = shares_adj$NZ50[which(!is.na(shares_adj$NZ50))[1]]
+for(i in 1:length(shares_adj$NZ50)) if(is.na(shares_adj$NZ50[i])) shares_adj$NZ50[i] = shares_adj$NZ50[i - 1]
+save(shares_adj, file = savepath("shares_adj"))
 
 ####################################
 #  Deployment
@@ -266,6 +303,9 @@ source("prep/copy-to-public.R")
 # https://github.com/nz-mbie/tourism-dashboard-public.git
 
 ######################
+#-------------Test shiny app locally----
+shiny::runApp("./shiny/new")
+
 #-------------Deploy shiny app----
 ######################
 if(!is.null(deploysuffix)){

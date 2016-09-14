@@ -58,8 +58,13 @@ div.divwell {
 div.divfull {
    width: 100%;
 }
-div.divfix700 {
-   max-width: 700px;
+div.divflex {
+   width: 100%;
+}
+@media (min-width: 1400px){
+   div.divflex {
+      width: 50%;
+   }
 }
 div.align-well {
    margin-left: 280px;
@@ -71,7 +76,7 @@ div.actcat {
 
 div.checkboxcombo div.checkboxcombo-all{
    margin-top: 0px;
-   margin-bottom: 20px;
+   margin-bottom: 10px;
 }
 div.checkboxcombo div.shiny-options-group{
    max-height: 230px;
@@ -161,6 +166,16 @@ div.dydownload-group ul {
 	-webkit-box-shadow: 0 0 5px #aaa;
 	box-shadow: 0 0 5px #aaa;
    font-size: smaller;
+}
+
+div.highcharts-tooltip table td:first-child {
+   padding-left: 0em;
+   text-align: left;
+}
+
+div.highcharts-tooltip table td {
+   padding-left: 1em;
+   text-align: right;
 }
 
 /* override shiny's jquery-ui styles for accordion */
@@ -269,7 +284,7 @@ div.front-banner > div.hcon > h1 {
 div.box-con {
    height: 130px;
    margin-top: 10px;
-   margin-bottom: 10px
+   margin-bottom: 10px;
 }
 
 div.box {
@@ -330,7 +345,7 @@ div.box-timeout {
 /* Fix width (manually adjusted)
    Looks better than the automatic widths if fixed correctly. */
 .navbar-default > .container {
-   width: 720px;
+   width: 740px;
 }
 
 /* Hide title and arrows */

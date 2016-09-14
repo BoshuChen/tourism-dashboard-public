@@ -1,21 +1,5 @@
-## Required for forex data
-## Attach so shinyapps gets it, but detach since it conflicts with ggvis
-## Instead get the function we want separately
-library(quantmod)
-detach(package:quantmod)
-getFX = quantmod::getFX
-
-## Required for Regional Summaries pdf export
-library(grid)
-library(ggplot2)
-library(scales)
-library(Cairo)
-load("mbie_footer.rda")
-
-## Remaining requirements
 source("shared_load.R")
 source("plots_funcs.R")
-source("rs_funcs.R")
 source("server_pack.R")
 
 shinyServer(function(input, output, session){
@@ -80,9 +64,15 @@ shinyServer(function(input, output, session){
    ## Accommodation Used
    vmacc(env_serv)
    
-   ####################
-   ## Global Context ##
-   ####################
+   ######################
+   ## Economic Context ##
+   ######################
    ## Exchange Rates
    gcforex(env_serv)
+   
+   ## Tourism-related Share Prices
+   ecshare(env_serv)
+   
+   ## Economic Growth Forecasts
+   ecgrof(env_serv)
 })

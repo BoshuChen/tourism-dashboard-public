@@ -7,6 +7,7 @@ library(zoo)
 library(xts)
 library(dygraphs)
 library(ggvis)
+# library(highcharter)
 
 source("helper_funcs.R")
 source("dygraph-extra-shiny.R")
@@ -380,47 +381,63 @@ ivs_accomm_used$AccommType = factor(ivs_accomm_used$AccommType, levels = ivs_acc
 ## Industry - Business Events (CAS)
 load("data/all_cas.rda")
 
-## RTE data, used for:
-##    Regions - Industry Sectors
-##    Industry - Spend by Visitor Market
-##    Visitor Markets - Compare Origins
-##    Visitor Markets - Compare Destinations
-env_rte = new.env()
-load("data/all_rte.rda", envir = env_rte)
-load("data/all_rte_levels.rda", envir = env_rte)
-with(env_rte, {
-   all_rte = wa2wha(all_rte)
-   all_rte_levels = wa2wha(all_rte_levels, check.characters = TRUE)
-   compcatRTR = structure(c("Region", "RTO", "Territorial_Authority"),
-      .Names = c("Region", "RTO", "Territorial authority"))
-   catOrigin = structure(c("All", "Domestic", "International"),
-      .Names = c("Total (All)", "Domestic origin", "International origin"))
-   levelsOrigin = list(Domestic = all_rte_levels$OriginDom,
-                       International = all_rte_levels$OriginInt)
-   catscale = structure(c("dv", "sv"),
-      .Names = c("Dollar figures", "Proportions"))
-   
-   ## Rearrange order of countries by Total Spend in all_rte
-   ## Disabled for now because it messes up colours
-   ##  and fixing is non-trivial
-   # flist = list(YEMar = max(all_rte$YEMar),
-                # Type = "International",
-                # Origin = levelsOrigin$International)
-   # rte_last = getdat(all_rte, "YEMar", "Origin", "Spend", flist)
-   # levelsOrigin$International = as.character(rte_last$Origin)[order(rte_last$Spend, decreasing = TRUE)]
-   
-   # Origin_levels_reorder = levels(all_rte$Origin)
-   # Origin_levels_reorder[Origin_levels_reorder %in% levelsOrigin$International] = levelsOrigin$International
-   # all_rte$Origin = factor(all_rte$Origin, levels = Origin_levels_reorder)
+## MRTE
+load("data/MVdata.rda")
+MVmod = local({
+   MVmod = MVdata
+   class(MVmod) = "data.frame"
+   MVmod = select(MVmod, YEAR, MONTH,
+                  Date, Product = PRODUCT,
+                  RTO, Region = REGION,
+                  Origin = COUNTRY, Type,
+                  Spend = SPEND)
+   for(i in 1:length(MVmod))
+      if(is.character(MVmod[[i]]))
+         MVmod[[i]] = factor(MVmod[[i]])
+   wa2wha(MVmod)
 })
-
-## Regions - Regional Summaries
-load("data/rs_data.rda")
-rs_data = wa2wha(rs_data, check.characters = TRUE)
-rs_data$areaclass = structure(names(rs_data$arealist),
-   .Names = gsub("TA", "Territorial authority", names(rs_data$arealist), fixed = TRUE))
-rs_data$allPeriods = as.character(sort(unique(rs_data$RTI$Period)))
-rs_data$CurrentYear = max(rs_data$RTE$YEMar)
+MVYE = local({
+   MVYE = MVmod %>%
+      mutate(YearEnded = as.numeric(YEAR) + as.numeric(as.numeric(MONTH) > as.numeric(format(max(MVmod$Date), "%m")))) %>%
+      filter(YearEnded > 2008) %>%
+      mutate(YearEnded = factor(YearEnded)) %>%
+      group_by(YearEnded, Product, RTO, Region, Origin, Type) %>%
+      summarise(Spend = sum(Spend))
+   class(MVYE) = "data.frame"
+   MVYE
+})
+MVmod = select(MVmod, -YEAR, -MONTH)
+MVYEyears = levels(MVYE$YearEnded)
+MVYE_str = format(max(MVmod$Date), "%B")
+MVYE_str_last = format(max(MVmod$Date), "%d %B %Y")
+MVareaclass = c("RTO", "Region")
+MVareaclass_s = c("RTOs", "Regions")
+MVarealist = lapply(MVmod[MVareaclass], levels)
+MVarealisttots = list()
+for(areaclass in MVareaclass)
+   MVarealisttots[[areaclass]] = c(paste0("Total (All ", areaclass, "s)"), MVarealist[[areaclass]])
+MVorigins = structure(c("All", "Domestic", "International"),
+   .Names = c("Total (All)", "Domestic origin", "International origin"))
+MVoriginslist = list()
+MVoriginslist$Domestic = local({
+   c("Total (Domestic)", sort(unique(as.character(filter(MVmod, Type == "Domestic")$Origin))))
+})
+MVoriginslist$International = local({
+   all_levels = sort(unique(as.character(filter(MVmod, Type == "International")$Origin)))
+   ind_rest = grep("(^Rest of)|(^Africa and Middle East)", all_levels)
+   c("Total (International)", all_levels[-ind_rest], all_levels[ind_rest])
+})
+MVoriginsAll = c(names(MVorigins)[1], MVoriginslist$Domestic,
+   MVoriginslist$International[-1], MVoriginslist$International[1])
+MVoriginsAll_notot = c(MVoriginslist$Domestic[-1], MVoriginslist$International[-1])
+MVmod$Origin = factor(MVmod$Origin, levels = MVoriginsAll_notot)
+MVYE$Origin = factor(MVYE$Origin, levels = MVoriginsAll_notot)
+MVproducts = c("Total (All Products)", levels(MVmod$Product))
+catscale = structure(c("dv", "sv"),
+   .Names = c("Dollar figures", "Proportions"))
+## Add temporary metadata
+attr(MVmod, "date") = as.Date("2016-07-15")
+attr(MVmod, "dataset") = "MRTE"
 
 ## Currencies to show in forex page
 fx_currencies = c(
@@ -454,6 +471,29 @@ fx_currency_to_ivs = list(
 ## Grab currencies for the latest 5 years, starting from January
 fx_all_years = as.numeric(format(Sys.time(), "%Y")) - 5:1
 fx_date_start = paste0(fx_all_years[1], "-12-31")
-fx_date_leadin = paste0(fx_all_years[1], "-01-01")
 ## Load fallback data
 load("data/env_forex_fallback.rda")
+
+## Load shares data
+load("data/shares_adj.rda")
+shares_names = c(
+   "AIA (Auckland International Airport)" = "AIA",
+   "AIR (Air New Zealand)" = "AIR",
+   "SKC (SKYCITY Entertainment Group)" = "SKC",
+   "THL (Tourism Holdings)" = "THL",
+   "NZX 50 Index" = "NZ50"
+)
+shares_all_years = unique(format(index(shares_adj), "%Y"))
+shares_index_dates = sapply(shares_all_years, function(x) as.character(index(shares_adj[x])[1]))
+names(shares_index_dates) = as.numeric(names(shares_index_dates)) - 1
+
+## GDP Growth data
+load("data/imf_weo.rda")
+weo_countries = levels(imf_weo$Country)
+weo_countries = weo_countries[-grep("New Zealand", weo_countries)]
+weo_ctoivs = weo_countries
+names(weo_ctoivs) = weo_countries
+weo_ctoivs["Korea"] = "Korea, Republic of"
+weo_ctoivs["United Kingdom"] = "UK"
+weo_ctoivs["United States"] = "USA"
+weo_years = unique(imf_weo$Year)

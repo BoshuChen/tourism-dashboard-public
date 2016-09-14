@@ -20,7 +20,7 @@ ivs_accomm_used = function(dataset_names){
       sum(main.PopulationWeight) as Pop,
       sum(main.PopulationWeight * main.WeightedSpend) as Spend
    from
-      vw_ivssurveymainheader main
+      Production.vw_ivssurveymainheader main
    group by
       main.Year,
       main.Qtr,

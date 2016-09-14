@@ -402,3 +402,152 @@ dyforex =
       
       renderDygraph(out_dy)
    }
+
+hcdotchart = local({
+   ## A fast way to create specialised comparison dotcharts in highcharts.
+   ## The local environment holds helper functions for the
+   ##  main function found at the end.
+   dconv =
+      ## Wrapper for converting a data.frame into
+      ##  the format required by highcharts.
+      function(x){
+         names(x) = NULL
+         out = list()
+         for(i in 1:nrow(x))
+            out[[i]] = as.list(x[i,])
+         out
+      }
+   
+   ## Main function
+   ## Arguments:
+   ## -curdat-
+   ## A dataframe with the data to plot.
+   ## Should have 3 variables for x, y, comp.
+   ##  x is the numeric variable.
+   ##  y is the categorical variable.
+   ##  comp is the grouping variable, should only have 2 unique elements.
+   ##
+   ## -plist-
+   ## A list naming the variables (x, y, comp).
+   ##  e.g. plist = list(x = "Value", y = "FirmSize", comp = "Sector")
+   ##
+   ## -xtitle-
+   ## Title for the x axis.
+   ##
+   ## -xformat-
+   ## List containing formatting specifications for x.
+   ##  Contains the prefix, suffix and the digits for rounding
+   ##  e.g. list(prefix = "$", suffix = "", digits = 0)
+   ##
+   ## -cols-
+   ## Two colours for the two groups.
+   function(curdat, plist, main, xlab, ttipformat, cols){
+      dat_spread = spread_(curdat, plist$comp, plist$x)
+      diffcols = rep(cols[1], length = nrow(dat_spread))
+      diffcols[dat_spread[,3] > dat_spread[,2]] = cols[2]
+      
+      ## Tooltip formatter JavaScript function for diffbar
+      diffJS = JS(paste0(
+         "function(){",
+         "  var diff = this.low - this.high;",
+         "  var dstr = (diff >= 0)?'above':'below';",
+         "  var dperc = Math.round(Math.abs(this.low/this.high - 1) * 1000)/10;",
+         "  return '<b>' + Highcharts.numberFormat(Math.abs(diff), 1) + '%</b><br/>';",
+         "}"
+      ))
+      ## When one of the dot series are hidden, also hide diffbar
+      showhideJS = JS('function(){
+         this.setVisible();
+         var vis = this.chart.series.every(function(x){
+            if(x.name != "diffbars"){
+               return x.visible
+            } else{
+               return true
+            }
+         });
+         var diffbars = this.chart.get("diffbars");
+         if(vis){
+            diffbars.show();
+         } else{
+            diffbars.hide();
+         }
+         
+         return false;
+      }')
+      
+      mainstyle = list(
+         "font-family" = "Fira Sans",
+         "font-size" = "12px",
+         "font-weight" = "bold"
+      )
+      
+      ## Note that because the chart is inverted, xAxis applies to y and vice versa
+      hc = highchart() %>%
+         hc_exporting(enabled = TRUE, formAttributes = list(target = "_blank")) %>%
+         hc_chart(inverted = TRUE, zoomType = "y", backgroundColor = NULL) %>%
+         hc_plotOptions(series = list(events = list(legendItemClick = showhideJS))) %>%
+         hc_title(text = main, useHTML = TRUE, style = mainstyle) %>%
+         hc_xAxis(categories = rev(curdat[[plist$y]]), tickmarkPlacement = "on",
+                  gridLineWidth = 1) %>%
+         hc_yAxis(title = list(text = xlab)) %>%
+         hc_legend(floating = TRUE, align = "left") %>%
+         hc_colors(cols) %>%
+         hc_tooltip(pointFormat = ttipformat) %>%
+         hc_add_series(type = "columnrange", data = dconv(dat_spread), id = "diffbars", name = "diffbars",
+                       pointWidth = 5, colorByPoint = TRUE, colors = diffcols, showInLegend = FALSE,
+                       tooltip = list(pointFormatter = diffJS, headerFormat =
+                       '<span style="font-size: 10px">Difference</span><br/>'))
+      for(curcomp in levels(curdat[[plist$comp]]))
+         hc = hc_add_series(hc, type = "scatter", marker = list(radius = 5, symbol = "circle"),
+            data = dconv(dat_spread[c(plist$y, curcomp)]), name = curcomp)
+      hc
+   }
+})
+
+hc_stackbar =
+   ## A fast way to create stacked barplots in highcharts.
+   function(curdat, plist, titles, yformat, scaled = FALSE){
+      ## Get fill categories and compute appropriate colour palette
+      ## Using hcl for now as mbie colours don't look good in a stacked barplot
+      catfill = levels(curdat[[plist$fill]])
+      # pal = mbie.cols2(seq(length = length(catfill) + 1))[1:length(catfill)]
+      pal = hcl(seq(0, 270, length = length(catfill)), c = 45, l = 80)
+      
+      ## Scale data if needed
+      if(scaled){
+         spread_dat = spread_(curdat, plist$x, plist$y)
+         scaled_dat = cbind(spread_dat[1], apply(spread_dat[,-1], 2, function(x) x/sum(x, na.rm = TRUE) * 100))
+         curdat = gather_(scaled_dat, plist$x, plist$y, colnames(scaled_dat)[-1])
+      }
+      
+      ## Compute appropriate decimal place
+      mbt = log10(mean(curdat[[plist$y]])) - 2
+      yprec = if(mbt < 0) ceiling(abs(mbt)) else 0
+      
+      spread_dat = spread_(curdat, plist$fill, plist$y)
+      
+      ttipformat = paste0('<tr><td><span style="color:{point.color}">\u25CF</span>',
+                         ' {series.name}</td><td><b>',
+                         yformat$prefix, '{point.y:.', yprec, 'f}', yformat$suffix,
+                         '</b></td></tr>')
+      
+      hc = highchart() %>%
+         hc_exporting(enabled = TRUE, formAttributes = list(target = "_blank")) %>%
+         hc_chart(type = "column", backgroundColor = NULL) %>%
+         hc_plotOptions(column = list(stacking = "normal", groupPadding = 0)) %>%
+         hc_title(text = titles$main) %>%
+         hc_xAxis(categories = spread_dat[[plist$x]]) %>%
+         hc_yAxis(title = list(text = titles$y),
+                  labels = list(format = paste0("{value}", if(scaled) "%")),
+                  max = if(scaled) 100 else NULL) %>%
+         hc_legend(enabled = FALSE) %>%
+         hc_tooltip(useHTML = TRUE, shared = TRUE,
+                    headerFormat = "{point.key}<br/><table>",
+                    pointFormat = ttipformat,
+                    footerFormat = "</table>") %>%
+         hc_colors(rev(pal))
+      for(curcat in rev(catfill))
+         hc = hc_add_series(hc, data = spread_dat[[curcat]],
+                            id = curcat, name = curcat)
+      hc
+   }

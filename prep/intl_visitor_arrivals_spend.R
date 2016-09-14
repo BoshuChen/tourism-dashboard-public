@@ -14,7 +14,8 @@ intl_visitor_arrivals = function(dataset_names){
    #------inbound visitors-----------------
    arriv1 <- ImportTS2(TRED, "Visitor arrivals by EVERY country of residence and purpose (Monthly)",
                       where = "cc2.ClassificationValue = 'TOTAL ALL TRAVEL PURPOSES'") %>% 
-      filter(toupper(CV1) != CV1) %>%
+      filter(!CV1 %in% c("TOTAL ALL COUNTRIES OF RESIDENCE", "AFRICA AND THE MIDDLE EAST", "AMERICAS",
+                           "ASIA", "EUROPE", "OCEANIA")) %>%
       group_by(TimePeriod, CountryGrouped) %>%
       summarise(Value = sum(Value)) %>%
       mutate(Year = substring(TimePeriod, 1, 4), 

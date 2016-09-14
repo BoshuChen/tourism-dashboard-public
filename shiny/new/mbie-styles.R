@@ -9,6 +9,5 @@ mbie_header =
                 title = "Ministry of Business, Innovation & Employment home page.",
                 tags$img(src = "mbie-logo.png",
                          alt = "Ministry of Business, Innovation & Employment"))
-      ),
-      tags$script('if(window != window.parent){$("#mbie-header").css("display", "none");}')
+      )
    )

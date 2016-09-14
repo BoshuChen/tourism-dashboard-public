@@ -62,6 +62,20 @@ tourism.cols <- function(x=c(1,2,3,5,12,6)){
 	as.vector(Tourism.cols[x])
 }
 
+getdp =
+   ## Function for computing an appropriate decimal place
+   ##  based on decimal places needed to display the
+   ##  smallest possible difference.
+   ## If all values are the same, returns decimal places
+   ##  needed to display this single unique value.
+   ## Due to floating point errors, the result may be off by 1.
+   ##  e.g. may return 2, when only 1 dp is needed.
+   function(x){
+      dx = diff(sort(unique(x)))
+      cv = if(length(dx) > 0) min(dx) else abs(x[1])
+      abs(min(0, round(log10(cv))))
+   }
+
 wa2wha =
    ## Recursively checks through the dataset, swapping any
    ##  instances of Wanganui to Whanganui
@@ -110,7 +124,7 @@ paldy =
    ##  curnames - vector containing currently selected variables
    ##  allnames - vector of all variables
    function(curnames, allnames){
-      basepal = mbie.cols2(seq(length = length(allnames)))
+      basepal = mbie.cols2(seq(length = length(allnames) + 1))[1:length(allnames)]
       names(basepal) = allnames
       basepal[curnames]
    }
@@ -664,4 +678,60 @@ casdat =
       if(!is.null(scaling)) dat_list$num = dat_list$num * scaling
       if(percentage) dat_list$num = t(apply(as.matrix(dat_list$num), 1, function(x) x/sum(x)*100))
       dat_list
+   }
+
+get_spend_arriv_dat =
+   ## Wrapper for getting index of yearly rolling average
+   ##  spend and arrival data quickly.
+   ##
+   ## Arguments:
+   ## -country-
+   ## Vector of countries to get data for
+   ##
+   ## -start_year-
+   ## Year the data should start from (noting that it will roll the first year)
+   ##
+   ## -date_indexbase-
+   ## Date to base the index
+   function(country, start_year, date_indexbase){
+      date_leadin = paste0(start_year, "-01-01")
+      date_start = paste0(start_year, "-12-31")
+      flist = list(Type = "Country of residence", Dimension = country)
+      ################
+      ## Spend data ##
+      ################
+      flist$Variable = "Total spend"
+      dat_spend = getdat(ivs, "TimePeriod", "Dimension", "Value", flist) %>%
+         filter(TimePeriod >= date_leadin) %>%
+         group_by(Dimension) %>%
+         mutate(Value = rollmean(Value, 4, fill = NA, align = "right")) %>%
+         filter(TimePeriod >= date_start, !is.na(Value)) %>%
+         mutate(Value = Value/mean(Value[TimePeriod == date_indexbase]) * 100) %>%
+         ungroup() %>%
+         spread(Dimension, Value)
+      
+      ###################
+      ## Arrivals data ##
+      ###################
+      flist$Variable = "Arrivals"
+      dat_arriv = getdat(arriv, "TimePeriod", "Dimension", "Value", flist) %>%
+         filter(TimePeriod >= date_leadin) %>%
+         group_by(Dimension) %>%
+         mutate(Value = rollmean(Value, 12, fill = NA, align = "right")) %>%
+         filter(TimePeriod >= date_start, !is.na(Value)) %>%
+         mutate(Value = Value/mean(Value[TimePeriod == date_indexbase]) * 100) %>%
+         ungroup() %>%
+         spread(Dimension, Value)
+      
+      ################
+      ## Merge Data ##
+      ################
+      if(length(country) > 1){
+         names(dat_spend) = c("TimePeriod", paste0("Total spend (", country, ")"))
+         names(dat_arriv) = c("TimePeriod", paste0("Arrivals (", country, ")"))
+      } else{
+         names(dat_spend) = c("TimePeriod", "Total spend")
+         names(dat_arriv) = c("TimePeriod", "Arrivals")
+      }
+      merge(dat_spend, dat_arriv, all = TRUE)
    }
