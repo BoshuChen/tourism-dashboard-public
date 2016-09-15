@@ -410,8 +410,11 @@ MVmod = select(MVmod, -YEAR, -MONTH)
 MVYEyears = levels(MVYE$YearEnded)
 MVYE_str = format(max(MVmod$Date), "%B")
 MVYE_str_last = format(max(MVmod$Date), "%d %B %Y")
-MVareaclass = c("RTO", "Region")
-MVareaclass_s = c("RTOs", "Regions")
+MVareaclass = c(
+   "Regional Tourism Organisation" = "RTO",
+   "Regional Council" = "Region"
+)
+MVareaclass_s = paste0(names(MVareaclass), "s")
 MVarealist = lapply(MVmod[MVareaclass], levels)
 MVarealisttots = list()
 for(areaclass in MVareaclass)
@@ -435,9 +438,6 @@ MVYE$Origin = factor(MVYE$Origin, levels = MVoriginsAll_notot)
 MVproducts = c("Total (All Products)", levels(MVmod$Product))
 catscale = structure(c("dv", "sv"),
    .Names = c("Dollar figures", "Proportions"))
-## Add temporary metadata
-attr(MVmod, "date") = as.Date("2016-07-15")
-attr(MVmod, "dataset") = "MRTE"
 
 ## Currencies to show in forex page
 fx_currencies = c(

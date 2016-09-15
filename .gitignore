@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 *.svg
+Thumbs.db
 *.dcf
 ._*
 

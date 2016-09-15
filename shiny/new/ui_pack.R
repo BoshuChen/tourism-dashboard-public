@@ -298,7 +298,7 @@ fixedRow(
             radioButtons("iaccobsroll", "Choose what to plot:", choices = obsroll, selected = "Both"),
             selectInputF("iacctype", "Type of accommodation", AccommType),
             radioButtons("iaccclass", "Variable", AccommClass),
-            checkboxComboInput("iaccRTO", "Choose an RTO", AccommRTOs)
+            checkboxComboInput("iaccRTO", "Choose a Regional Tourism Organisation", AccommRTOs)
          )
       ),
       div(id = "iaccdyLegend", class = "dylegend")

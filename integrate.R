@@ -199,24 +199,9 @@ ivs_accomm_used("IVS")
 ##-----------------------------------------------##
 ## Data that draws from non-TRED/PlayPen sources ##
 ##-----------------------------------------------##
-## RTE data, used for:
-##    Regions - Industry Sectors
-##    Industry - Spend by Visitor Market
-##    Visitor Markets - Compare Origins
-##    Visitor Markets - Compare Destinations
-## Latest RTE data is not in TRED, thus this script pulls from a csv.gz file
-## See: https://github.com/nz-mbie/tourism-dashboard/issues/57
+## MRTE data
 sourceprep("copy_MRTEs_from_P_to_local.R")
-sourceprep("RTE_data.R")
-RTE_data("RTE")
-
-
-## Regions - Regional Summaries
-## Uses both RTE and RTI data
-## RTE data from same source as above
-## RTI data comes from TRED
-sourceprep("rs_data.R")
-rs_data(c("RTI", "RTE"))
+copy_MRTEs_from_P_to_local("MRTE")
 
 ## Industry - Business Events (CAS)
 ## Comes from a pivot table
